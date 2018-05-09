@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Runtime.CompilerServices;
 
@@ -11,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Frends.PowerShell
 {
     /// <summary>
-    /// Wraps the powershell session,
+    /// Wraps the powershell session
     /// </summary>
     public class SessionWrapper : IDisposable
     {
@@ -73,7 +72,7 @@ namespace Frends.PowerShell
         /// <summary>
         /// Executes a PowerShell script from a file or the script parameter
         /// </summary>
-        /// <returns>Object { PSObject Result }</returns>
+        /// <returns>List&lt;Object&gt;</returns>
         public static PowerShellResult RunScript(RunScriptInput input, [Browsable(false)]RunOptions options)
         {
             return DoAndHandleSession(options?.Session, session =>
@@ -110,7 +109,7 @@ namespace Frends.PowerShell
         /// <summary>
         /// Executes a PowerShell command with parameters, leave parameter value empty for a switch
         /// </summary>
-        /// <returns>Object { PSObject Result }</returns>
+        /// <returns>List&lt;Object&gt;</returns>
         public static PowerShellResult RunCommand(RunCommandInput input, [Browsable(false)]RunOptions options)
         {
             return DoAndHandleSession(options?.Session, (session) =>
@@ -120,7 +119,7 @@ namespace Frends.PowerShell
                 var command = new Command(input.Command, isScript: false, useLocalScope: false);
                 foreach (var parameter in input.Parameters)
                 {
-                    var parameterName = parameter.Name.TrimStart('-'); // Remove dash from start
+                    var parameterName = parameter.Name.Trim('-', ' '); // Remove dash from start
                     if (parameter.Value == null ||
                         (parameter.Value is String && string.IsNullOrWhiteSpace((string)parameter.Value)))
                     {
@@ -130,7 +129,6 @@ namespace Frends.PowerShell
                     {
                         command.Parameters.Add(new CommandParameter(parameterName, parameter.Value));
                     }
-
                 }
 
                 powershell.Commands.AddCommand(command);
@@ -149,11 +147,11 @@ namespace Frends.PowerShell
                 throw new Exception(string.Join("\n", powershell.Streams.Error.Select(e => e.Exception.Message)));
             }
 
-            powershell.Commands.Clear(); // Clear the executed commands so they do not get executed again
+            powershell.Commands.Clear(); // Clear the executed commands from the session so they do not get executed again
 
             return new PowerShellResult
             {
-                Result = result.LastOrDefault(o => o != null)?.BaseObject
+                Result = result.Select(r => r.BaseObject).ToList()
             };
         }
     }

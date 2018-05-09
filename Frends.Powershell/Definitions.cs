@@ -11,6 +11,7 @@ namespace Frends.PowerShell
     public class PowerShellParameter
     {
         public string Name { get; set; }
+        [DisplayFormat(DataFormatString = "Text")]
         public object Value { get; set; }
     }
 
