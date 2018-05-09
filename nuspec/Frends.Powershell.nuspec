@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>Frends.Powershell</id>
+    <version>1.0.0.0</version>
+    <title>FRENDS Powershell tasks</title>
+    <authors>HiQ Finland</authors>
+    <owners />
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>FRENDS Powershell tasks</description>
+    <summary />
+    <dependencies>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System" />
+      <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" />
+      <frameworkAssembly assemblyName="System.Core" />
+      <frameworkAssembly assemblyName="System.Management.Automation" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+	  <file src="Frends.Powershell\bin\Release\Frends.Powershell.dll" target="lib\net452\Frends.Powershell.dll" />
+    <file src="Frends.Powershell\bin\Release\Frends.Powershell.XML" target="Frends.Powershell.XML"/>
+    <file src="Frends.Powershell\FrendsTaskMetadata.json" target="FrendsTaskMetadata.json"/>
+  </files>
+</package>
