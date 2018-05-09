@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
     <id>Frends.Powershell</id>
-    <version>1.0.5.0</version>
+    <version>1.0.0.0</version>
     <title>FRENDS Powershell tasks</title>
     <authors>HiQ Finland</authors>
     <owners />
@@ -10,13 +10,12 @@
     <description>FRENDS Powershell tasks</description>
     <summary />
     <dependencies>
-      <!-- <dependency id="Newtonsoft.Powershell" version="6.0.8" />
-      <dependency id="Newtonsoft.Powershell.Schema" version="2.0.8" />
-      <dependency id="Handlebars.Net" version="[1.7.1]" /> -->
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System" />
-      <frameworkAssembly assemblyName="System.Data" />
+      <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" />
+      <frameworkAssembly assemblyName="System.Core" />
+      <frameworkAssembly assemblyName="System.Management.Automation" />
     </frameworkAssemblies>
   </metadata>
   <files>

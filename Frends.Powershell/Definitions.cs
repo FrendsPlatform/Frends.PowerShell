@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.PowerShell
@@ -35,6 +36,6 @@ namespace Frends.PowerShell
 
     public class PowerShellResult
     {
-        public object Result { get; set; }
+        public IList<object> Result { get; set; }
     }
 }

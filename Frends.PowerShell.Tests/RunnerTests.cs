@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Management.Automation;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
-using NUnit.Framework.Api;
 
 namespace Frends.PowerShell.Tests
 {
@@ -32,7 +27,7 @@ namespace Frends.PowerShell.Tests
                 new RunOptions());
 
             Assert.That(result.Result, Is.Not.Null);
-            Assert.That(result.Result, Is.EqualTo(TimeSpan.FromHours(1)));
+            Assert.That(result.Result.Single(), Is.EqualTo(TimeSpan.FromHours(1)));
         }
 
         [TestCase(null)]
@@ -60,7 +55,7 @@ namespace Frends.PowerShell.Tests
                 new RunOptions());
 
             Assert.That(result.Result, Is.Not.Null);
-            Assert.That(result.Result, Is.TypeOf<FileVersionInfo>());
+            Assert.That(result.Result, Is.All.TypeOf<FileVersionInfo>());
         }
 
 
@@ -88,8 +83,8 @@ new-timespan -hours 2";
                 File.Delete(scriptFilePath);
             }
 
-            // The result should be the last output of the script
-            Assert.That(result.Result, Is.EqualTo(TimeSpan.FromHours(2)));
+            Assert.That(result.Result.Count, Is.EqualTo(2));
+            Assert.That(result.Result.Last(), Is.EqualTo(TimeSpan.FromHours(2)));
         }
 
         [Test]
@@ -104,8 +99,7 @@ new-timespan -hours 2";
             }, new RunOptions());
 
 
-            // The result should be the last output of the script
-            Assert.That(result.Result, Is.EqualTo(TimeSpan.FromHours(2)));
+            Assert.That(result.Result.Last(), Is.EqualTo(TimeSpan.FromHours(2)));
         }
 
         [Test]
@@ -133,7 +127,7 @@ new-timespan -hours 2";
                     Session = session
                 });
 
-            Assert.That(result2.Result, Is.EqualTo(TimeSpan.FromHours(2)));
+            Assert.That(result2.Result.Single(), Is.EqualTo(TimeSpan.FromHours(2)));
         }
     }
 }
