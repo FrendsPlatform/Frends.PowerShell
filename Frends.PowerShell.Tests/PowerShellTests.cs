@@ -12,7 +12,7 @@ namespace Frends.PowerShell.Tests
         [Test]
         public void RunCommand_ShouldRunCommandWithParameter()
         {
-            var result = Runner.RunCommand(new RunCommandInput
+            var result = PowerShell.RunCommand(new RunCommandInput
             {
                 Command = "New-TimeSpan",
                 Parameters = new[]
@@ -30,32 +30,37 @@ namespace Frends.PowerShell.Tests
             Assert.That(result.Result.Single(), Is.EqualTo(TimeSpan.FromHours(1)));
         }
 
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase(" ")]
-        public void RunCommand_ShouldRunCommandWithSwitchParameter(string switchParameterValue)
+        [TestCase(true)]
+        [TestCase(false)]
+        public void RunCommand_ShouldRunCommandWithSwitchParameter(object switchParameterValue)
         {
-            var result = Runner.RunCommand(new RunCommandInput
+            var session = PowerShell.CreateSession();
+            session.PowerShell.AddScript(@"
+function Test-Switch { 
+    param([switch] $switchy) 
+    $switchy.IsPresent 
+}", false);
+            session.PowerShell.Invoke();
+            session.PowerShell.Commands.Clear();
+
+            var result = PowerShell.RunCommand(new RunCommandInput
             {
-                Command = "get-process",
+                Command = "Test-Switch",
                 Parameters = new[]
                     {
                         new PowerShellParameter
                         {
-                            Name = "Name",
-                            Value = "Powershell"
-                        },
-                        new PowerShellParameter
-                        {
-                            Name = "FileVersionInfo",
+                            Name = "switchy",
                             Value = switchParameterValue
                         }
                     }
             },
-                new RunOptions());
+                new RunOptions
+                {
+                    Session = session
+                });
 
-            Assert.That(result.Result, Is.Not.Null);
-            Assert.That(result.Result, Is.All.TypeOf<FileVersionInfo>());
+            Assert.That(result.Result.Single(), Is.EqualTo(switchParameterValue));
         }
 
 
@@ -72,7 +77,7 @@ new-timespan -hours 2";
             try
             {
                 File.WriteAllText(scriptFilePath, script);
-                result = Runner.RunScript(new RunScriptInput
+                result = PowerShell.RunScript(new RunScriptInput
                 {
                     ReadFromFile = true,
                     ScriptFilePath = scriptFilePath
@@ -92,7 +97,7 @@ new-timespan -hours 2";
         {
             PowerShellResult result;
 
-            result = Runner.RunScript(new RunScriptInput
+            result = PowerShell.RunScript(new RunScriptInput
             {
                 ReadFromFile = false,
                 Script = script
@@ -105,9 +110,9 @@ new-timespan -hours 2";
         [Test]
         public void RunCommandAndScript_ShouldUseSharedSession()
         {
-            var session = Runner.CreateSession();
+            var session = PowerShell.CreateSession();
 
-            var result1 = Runner.RunScript(new RunScriptInput
+            var result1 = PowerShell.RunScript(new RunScriptInput
             {
                 ReadFromFile = false,
                 Script = "$timespan = $timespan + (new-timespan -hours 1)"
@@ -117,7 +122,7 @@ new-timespan -hours 2";
                     Session = session
                 });
 
-            var result2 = Runner.RunScript(new RunScriptInput
+            var result2 = PowerShell.RunScript(new RunScriptInput
                 {
                     ReadFromFile = false,
                     Script = "(new-timespan -hours 1) + $timespan"
