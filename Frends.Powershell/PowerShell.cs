@@ -6,7 +6,7 @@ using System.Linq;
 using System.Management.Automation.Runspaces;
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Frends.PowerShell.Tests")]
+[assembly: InternalsVisibleTo("Frends.PowerShell.Tests")]
 namespace Frends.PowerShell
 {
     /// <summary>
@@ -26,7 +26,7 @@ namespace Frends.PowerShell
             Runspace.Open();
             PowerShell.Runspace = Runspace;
         }
-        
+
         private void ReleaseUnmanagedResources()
         {
             try
@@ -57,7 +57,7 @@ namespace Frends.PowerShell
         }
     }
 
-    public static class Runner
+    public static class PowerShell
     {
         /// <summary>
         /// Creates a PowerShell session which can be shared between scripts and commands.
@@ -120,15 +120,9 @@ namespace Frends.PowerShell
                 foreach (var parameter in input.Parameters)
                 {
                     var parameterName = parameter.Name.Trim('-', ' '); // Remove dash from start
-                    if (parameter.Value == null ||
-                        (parameter.Value is String && string.IsNullOrWhiteSpace((string)parameter.Value)))
-                    {
-                        command.Parameters.Add(new CommandParameter(parameterName));
-                    }
-                    else
-                    {
-                        command.Parameters.Add(new CommandParameter(parameterName, parameter.Value));
-                    }
+
+                    // Switch parameters will have to specify value as true:
+                    command.Parameters.Add(new CommandParameter(parameterName, parameter.Value));
                 }
 
                 powershell.Commands.AddCommand(command);

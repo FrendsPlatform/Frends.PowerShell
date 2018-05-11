@@ -4,10 +4,10 @@
       "TaskMethod": "Frends.PowerShell.Runner.CreateSession"
     },*/
     {
-      "TaskMethod": "Frends.PowerShell.Runner.RunCommand"
+      "TaskMethod": "Frends.PowerShell.PowerShell.RunCommand"
     },
     {
-      "TaskMethod": "Frends.PowerShell.Runner.RunScript"
+      "TaskMethod": "Frends.PowerShell.PowerShell.RunScript"
     }
   ]
 }
