@@ -18,6 +18,7 @@ namespace Frends.PowerShell
 
     public class RunScriptInput
     {
+        public PowerShellParameter[] Parameters { get;set; }
         public bool ReadFromFile { get; set; }
 
         [UIHint(nameof(ReadFromFile), "", true)]
@@ -25,6 +26,7 @@ namespace Frends.PowerShell
 
         [UIHint(nameof(ReadFromFile), "", false)]
         public string Script { get; set; }
+
     }
 
     public class RunOptions
@@ -37,5 +39,7 @@ namespace Frends.PowerShell
     public class PowerShellResult
     {
         public IList<object> Result { get; set; }
+        public IList<string> Errors { get; set; }
+        public string Log { get; set; }
     }
 }
