@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Runtime.CompilerServices;
 
@@ -83,10 +84,17 @@ namespace Frends.PowerShell
                     script = File.ReadAllText(input.ScriptFilePath);
                 }
 
-                var powershell = session.PowerShell;
-                powershell.AddScript(script);
+                var tempScript = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.ps1");
+                try
+                {
+                    File.WriteAllText(tempScript, script);
 
-                return ExecutePowershell(powershell);
+                    return ExecuteCommand(tempScript, input.Parameters, session.PowerShell);
+                }
+                finally
+                {
+                    File.Delete(tempScript);
+                }
             });
         }
 
@@ -114,39 +122,52 @@ namespace Frends.PowerShell
         {
             return DoAndHandleSession(options?.Session, (session) =>
             {
-                var powershell = session.PowerShell;
-
-                var command = new Command(input.Command, isScript: false, useLocalScope: false);
-                foreach (var parameter in input.Parameters)
-                {
-                    var parameterName = parameter.Name.Trim('-', ' '); // Remove dash from start
-
-                    // Switch parameters will have to specify value as true:
-                    command.Parameters.Add(new CommandParameter(parameterName, parameter.Value));
-                }
-
-                powershell.Commands.AddCommand(command);
-
-                return ExecutePowershell(powershell);
+                return ExecuteCommand(input.Command, input.Parameters, session.PowerShell);
             });
 
         }
 
-        private static PowerShellResult ExecutePowershell(System.Management.Automation.PowerShell powershell)
+        private static PowerShellResult ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters,
+            System.Management.Automation.PowerShell powershell)
         {
-            var result = powershell.Invoke();
+            var command = new Command(inputCommand, isScript: false, useLocalScope: false);
 
-            if (powershell.HadErrors)
+            foreach (var parameter in powerShellParameters ?? new PowerShellParameter[]{})
             {
-                throw new Exception(string.Join("\n", powershell.Streams.Error.Select(e => e.Exception.Message)));
+                var parameterName = parameter.Name.Trim('-', ' '); // Remove dash from start
+
+                // Switch parameters will have to specify value as true:
+                command.Parameters.Add(new CommandParameter(parameterName, parameter.Value));
             }
 
-            powershell.Commands.Clear(); // Clear the executed commands from the session so they do not get executed again
+            powershell.Commands.AddCommand(command);
 
-            return new PowerShellResult
+            return ExecutePowershell(powershell);
+        }
+
+        private static PowerShellResult ExecutePowershell(System.Management.Automation.PowerShell powershell)
+        {
+            try
             {
-                Result = result.Select(r => r.BaseObject).ToList()
-            };
+                var execution = powershell.Invoke();
+                var result = new PowerShellResult
+                {
+                    Result = execution.Select(r => r.BaseObject).ToList(),
+                    Errors = powershell.Streams.Error.Select(err => err.Exception.Message).ToList(),
+                    Log = string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
+                };
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Encountered terminating error while executing powershell: \n{e}\nErrors:\n{string.Join("\n",powershell.Streams.Error.Select(err => err.Exception.Message))}");
+            }
+            finally
+            {
+                powershell.Commands.Clear(); // Clear the executed commands from the session so they do not get executed again
+                powershell.Streams.ClearStreams();
+            }
         }
     }
 }

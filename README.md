@@ -53,7 +53,7 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
 ### PowerShell.RunCommand 
 
-Execute a single PowerShell command
+Execute a single PowerShell command with parameters, the Task fails when a terminating error is encountered or an error is thrown
 
 #### Input
 
@@ -64,22 +64,24 @@ Execute a single PowerShell command
 
 
 #### Result
-{Result: Array{object}}
+{Result: Array{object}, Errors: Array{string}, Log: string}
 
 ### PowerShell.RunScript
 
-Run a PowerShell script
+Run a PowerShell script with parameters, the Task fails when a terminating error is encountered or an error is thrown
 
 #### Input
 
-| Property          | Type                            | Description                                                                             | Example                                                  |
-| ----------------- | ------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| ReadFromFile      | bool                            | Should the script be read from a file or from the Script parameter                      | `true`                                                   |
-| ScriptFilePath    | string                          | Location for the script file                                                            | `F:\myScript.ps1`                                        |
-| Script            | string                          | The script to execute                                                                   | `New-TimeSpan -Hours 1 \| convertto-json`                |
+| Property          | Type                               | Description                                                                             | Example                                                  |
+| ----------------- | ---------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| ReadFromFile      | bool                               | Should the script be read from a file or from the Script parameter                      | `true`                                                   |
+| ScriptFilePath    | string                             | Location for the script file                                                            | `F:\myScript.ps1`                                        |
+| Script            | string                             | The script to execute                                                                   | `New-TimeSpan -Hours 1 \| convertto-json`                |
+| Parameters        | Array{Name: string, Value: object} | Parameters for the script, provided switch parameters need to have a boolean value      | `Name = Hours, Value = 1`                                |
+
 
 #### Result
-{Result: Array{object}}
+{Result: Array{object}, Errors: Array{string}, Log: string}
 
 
 ## License

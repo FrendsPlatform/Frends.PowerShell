@@ -30,6 +30,24 @@ namespace Frends.PowerShell.Tests
             Assert.That(result.Result.Single(), Is.EqualTo(TimeSpan.FromHours(1)));
         }
 
+        [Test]
+        public void RunScript_ShouldRunScriptWithParameter()
+        {
+            var script = @"param([string]$testParam)
+$testParam
+write-output ""my test param: $testParam""";
+
+            var result = PowerShell.RunScript(new RunScriptInput
+            {
+                Parameters = new[] {new PowerShellParameter {Name = "testParam", Value = "my test param"}},
+                ReadFromFile = false,
+                Script = script
+            }, new RunOptions());
+
+            Assert.That(result.Result.Count, Is.EqualTo(2));
+            Assert.That(result.Result.Last(), Is.EqualTo("my test param: my test param"));
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void RunCommand_ShouldRunCommandWithSwitchParameter(object switchParameterValue)
@@ -133,6 +151,19 @@ new-timespan -hours 2";
                 });
 
             Assert.That(result2.Result.Single(), Is.EqualTo(TimeSpan.FromHours(2)));
+        }
+
+        [Test]
+        public void RunScript_ShouldListErrors()
+        {
+            var script = 
+@"This-DoesNotExist
+get-process -name doesnotexist -ErrorAction Stop
+";
+
+            var resultError = Assert.Throws<Exception>(() => PowerShell.RunScript(new RunScriptInput {ReadFromFile = false, Script = script}, null));
+
+            Assert.That(resultError.Message, Is.Not.Null);
         }
     }
 }
