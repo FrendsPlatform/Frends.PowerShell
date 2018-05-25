@@ -51,6 +51,8 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
 ## Documentation
 
+The PowerShell Tasks require PowerShell 5.0 to work
+
 ### PowerShell.RunCommand 
 
 Execute a single PowerShell command with parameters, the Task fails when a terminating error is encountered or an error is thrown

@@ -38,7 +38,7 @@ namespace Frends.PowerShell
 
     public class PowerShellResult
     {
-        public IList<object> Result { get; set; }
+        public IList<dynamic> Result { get; set; }
         public IList<string> Errors { get; set; }
         public string Log { get; set; }
     }
