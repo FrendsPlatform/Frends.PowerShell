@@ -165,5 +165,24 @@ get-process -name doesnotexist -ErrorAction Stop
 
             Assert.That(resultError.Message, Is.Not.Null);
         }
+
+        [Test]
+        public void RunScript_ShouldOutputCustomPowershellObjects()
+        {
+            var script =
+@"$test = New-Object pscustomobject
+$test | Add-Member -type NoteProperty -name Property1 -Value 'Value1'
+$test | Add-Member -type NoteProperty -name Property2 -Value 'Value2'
+$test
+";
+            var result = PowerShell.RunScript(new RunScriptInput
+            {
+                ReadFromFile = false,
+                Script = script
+            }, null);
+
+            Assert.That(result.Result[0].Property1, Is.EqualTo("Value1"));
+            Assert.That(result.Result[0].Property2, Is.EqualTo("Value2"));
+        }
     }
 }

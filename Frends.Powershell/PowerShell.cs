@@ -73,7 +73,7 @@ namespace Frends.PowerShell
         /// <summary>
         /// Executes a PowerShell script from a file or the script parameter
         /// </summary>
-        /// <returns>List&lt;Object&gt;</returns>
+        /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
         public static PowerShellResult RunScript(RunScriptInput input, [Browsable(false)]RunOptions options)
         {
             return DoAndHandleSession(options?.Session, session =>
@@ -117,7 +117,7 @@ namespace Frends.PowerShell
         /// <summary>
         /// Executes a PowerShell command with parameters, leave parameter value empty for a switch
         /// </summary>
-        /// <returns>List&lt;Object&gt;</returns>
+        /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
         public static PowerShellResult RunCommand(RunCommandInput input, [Browsable(false)]RunOptions options)
         {
             return DoAndHandleSession(options?.Session, (session) =>
@@ -132,7 +132,7 @@ namespace Frends.PowerShell
         {
             var command = new Command(inputCommand, isScript: false, useLocalScope: false);
 
-            foreach (var parameter in powerShellParameters ?? new PowerShellParameter[]{})
+            foreach (var parameter in powerShellParameters ?? new PowerShellParameter[] { })
             {
                 var parameterName = parameter.Name.Trim('-', ' '); // Remove dash from start
 
@@ -152,7 +152,8 @@ namespace Frends.PowerShell
                 var execution = powershell.Invoke();
                 var result = new PowerShellResult
                 {
-                    Result = execution.Select(r => r.BaseObject).ToList(),
+                    // Powershell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
+                    Result = execution.Select(GetResultObject).ToList(),
                     Errors = powershell.Streams.Error.Select(err => err.Exception.Message).ToList(),
                     Log = string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
                 };
@@ -161,13 +162,23 @@ namespace Frends.PowerShell
             }
             catch (Exception e)
             {
-                throw new Exception($"Encountered terminating error while executing powershell: \n{e}\nErrors:\n{string.Join("\n",powershell.Streams.Error.Select(err => err.Exception.Message))}");
+                throw new Exception($"Encountered terminating error while executing powershell: \n{e}\nErrors:\n{string.Join("\n", powershell.Streams.Error.Select(err => err.Exception.Message))}");
             }
             finally
             {
                 powershell.Commands.Clear(); // Clear the executed commands from the session so they do not get executed again
                 powershell.Streams.ClearStreams();
             }
+        }
+
+        private static object GetResultObject(PSObject result)
+        {
+            if (result.BaseObject == null || result.BaseObject is PSCustomObject)
+            {
+                return result;
+            }
+
+            return result.BaseObject;
         }
     }
 }

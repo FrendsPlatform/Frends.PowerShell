@@ -16,6 +16,7 @@
       <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" />
       <frameworkAssembly assemblyName="System.Core" />
       <frameworkAssembly assemblyName="System.Management.Automation" />
+      <frameworkAssembly assemblyName="Microsoft.CSharp" />
     </frameworkAssemblies>
   </metadata>
   <files>
