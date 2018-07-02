@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -145,6 +146,11 @@ namespace Frends.PowerShell
             return ExecutePowershell(powershell);
         }
 
+        private static IList<string> GetErrorMessages(PSDataCollection<ErrorRecord> errors)
+        {
+            return errors.Select(err => $"{err.ScriptStackTrace}: {err.Exception.Message}").ToList();
+        }
+
         private static PowerShellResult ExecutePowershell(System.Management.Automation.PowerShell powershell)
         {
             try
@@ -154,7 +160,7 @@ namespace Frends.PowerShell
                 {
                     // Powershell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
                     Result = execution.Select(GetResultObject).ToList(),
-                    Errors = powershell.Streams.Error.Select(err => err.Exception.Message).ToList(),
+                    Errors = GetErrorMessages(powershell.Streams.Error),
                     Log = string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
                 };
 
@@ -162,7 +168,7 @@ namespace Frends.PowerShell
             }
             catch (Exception e)
             {
-                throw new Exception($"Encountered terminating error while executing powershell: \n{e}\nErrors:\n{string.Join("\n", powershell.Streams.Error.Select(err => err.Exception.Message))}");
+                throw new Exception($"Encountered terminating error while executing powershell: \n{e}\nErrors:\n{string.Join("\n", GetErrorMessages(powershell.Streams.Error))}");
             }
             finally
             {
