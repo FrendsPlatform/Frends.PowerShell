@@ -159,7 +159,7 @@ namespace Frends.PowerShell
                 var result = new PowerShellResult
                 {
                     // Powershell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
-                    Result = execution.Select(GetResultObject).ToList(),
+                    Result = execution?.Select(GetResultObject).ToList(),
                     Errors = GetErrorMessages(powershell.Streams.Error),
                     Log = string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
                 };
@@ -179,7 +179,7 @@ namespace Frends.PowerShell
 
         private static object GetResultObject(PSObject result)
         {
-            if (result.BaseObject == null || result.BaseObject is PSCustomObject)
+            if (result?.BaseObject == null || result.BaseObject is PSCustomObject)
             {
                 return result;
             }
