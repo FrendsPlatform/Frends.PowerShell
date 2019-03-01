@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Frends.PowerShell.Tests
+namespace Frends.Community.PowerShell.Tests
 {
     [TestFixture]
     public class PowerShellTests

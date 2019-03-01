@@ -8,7 +8,7 @@ using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Security;
 
-namespace Frends.PowerShell
+namespace Frends.Community.PowerShell
 {
     internal class TaskUserInterface : PSHostUserInterface
     {
