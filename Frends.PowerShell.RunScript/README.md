@@ -2,7 +2,8 @@
 
 [![Frends.PowerShell.RunScript Main](https://github.com/FrendsPlatform/Frends.PowerShell/actions/workflows/RunScript_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.PowerShell/actions/workflows/RunScript_build_and_test_on_main.yml)
 ![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.PowerShell.RunScript?label=NuGet)
- ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.PowerShell?label=License)
+![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.PowerShell?label=License)
+![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.PowerShell/Frends.PowerShell.RunScript|main)
 
 Run a PowerShell script with parameters, the Task fails when a terminating error is encountered or an error is thrown
 
