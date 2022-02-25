@@ -5,7 +5,7 @@
 ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.PowerShell?label=License)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.PowerShell/Frends.PowerShell.RunScript|main)
 
-Run a PowerShell script with parameters, the Task fails when a terminating error is encountered or an error is thrown
+Run a PowerShell script with parameters, the Task fails when a terminating error is encountered or an error is thrown.
 
 ## Installing
 
