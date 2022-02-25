@@ -64,7 +64,7 @@ namespace Frends.PowerShell
 
         public override Dictionary<string, PSObject> Prompt(string caption, string message, Collection<FieldDescription> descriptions)
         {
-            return descriptions.ToDictionary(desc => desc.Name, desc => new PSObject("")); // Return empty string as answer
+            return descriptions?.ToDictionary(desc => desc.Name, desc => new PSObject("")); // Return empty string as answer
         }
 
         public override PSCredential PromptForCredential(string caption, string message, string userName, string targetName)
@@ -190,7 +190,7 @@ namespace Frends.PowerShell
 
         public override void SetShouldExit(int exitCode)
         {
-            
+
         }
 
         /// <summary>

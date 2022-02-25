@@ -1,0 +1,20 @@
+name: Frends.PowerShell.RunScript Main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.PowerShell.RunScript/**'
+      - 'Frends.PowerShell.RunScript.Tests/**'
+  workflow_dispatch:
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
+    with:
+      workdir: Frends.PowerShell.RunScript
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      
