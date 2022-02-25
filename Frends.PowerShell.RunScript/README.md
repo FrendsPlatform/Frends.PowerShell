@@ -37,7 +37,7 @@ You can install the task via FRENDS UI Task View or you can find the NuGet packa
 
 Clone a copy of the repo
 
-`git clone https://github.com/FrendsPlatform/Frends.PowerShell.git`
+`git clone https://github.com/FrendsPlatform/Frends.PowerShell.RunScript.git`
 
 Rebuild the project
 

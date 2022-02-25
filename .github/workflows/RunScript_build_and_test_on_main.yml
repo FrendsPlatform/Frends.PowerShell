@@ -6,8 +6,9 @@ on:
       - main
     paths:
       - 'Frends.PowerShell.RunScript/**'
-      - 'Frends.PowerShell.RunScript.Tests/**'
   workflow_dispatch:
+    paths:
+      - 'Frends.PowerShell.RunScript/**'
   
 
 jobs:

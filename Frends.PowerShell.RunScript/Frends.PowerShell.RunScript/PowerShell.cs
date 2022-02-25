@@ -78,7 +78,7 @@ namespace Frends.PowerShell.RunScript
         /// Executes a PowerShell script from a file or the script parameter
         /// </summary>
         /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
-        public static PowerShellResult RunScript(RunScriptInput input, [Browsable(false)] RunOptions options)
+        public static PowerShellResult RunScript(RunScriptInput input, [Browsable(false)]RunOptions options)
         {
             return DoAndHandleSession(options?.Session, session =>
             {
