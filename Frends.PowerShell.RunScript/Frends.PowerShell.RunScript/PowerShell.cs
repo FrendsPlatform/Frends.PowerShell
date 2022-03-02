@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
@@ -14,53 +13,6 @@ using System.Text;
 [assembly: InternalsVisibleTo("Frends.PowerShell.RunScript.Tests")]
 namespace Frends.PowerShell.RunScript
 {
-    /// <summary>
-    /// Wraps the powershell session
-    /// </summary>
-    public class SessionWrapper : IDisposable
-    {
-        internal Runspace Runspace;
-        internal System.Management.Automation.PowerShell PowerShell;
-
-        public SessionWrapper()
-        {
-            var host = new TaskPowershellHost();
-            Runspace = RunspaceFactory.CreateRunspace(host);
-            PowerShell = System.Management.Automation.PowerShell.Create();
-
-            Runspace.Open();
-            PowerShell.Runspace = Runspace;
-        }
-
-        private void ReleaseUnmanagedResources()
-        {
-            try
-            {
-                PowerShell?.Dispose();
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine($"Encountered error while disposing powershell session: {e}");
-            }
-            PowerShell = null;
-
-            try
-            {
-                Runspace?.Dispose();
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine($"Encountered error while disposing powershell runspace: {e}");
-            }
-            Runspace = null;
-        }
-
-        public void Dispose()
-        {
-            ReleaseUnmanagedResources();
-            GC.SuppressFinalize(this);
-        }
-    }
 
     public static class PowerShell
     {

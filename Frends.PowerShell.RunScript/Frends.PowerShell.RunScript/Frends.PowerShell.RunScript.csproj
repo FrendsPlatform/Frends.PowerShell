@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFramework>net471</TargetFramework>
+	<TargetFrameworks>net6.0</TargetFrameworks>
     <authors>HiQ Finland</authors>
     <copyright>HiQ Finland</copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -9,8 +9,8 @@
     <IncludeSource>true</IncludeSource>
     <PackageTags>Frends</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>1.0.0</Version>
-	<Description>Task for running scripts on PowerShell. Requires PowerShell 5.0 to work.</Description>
+    <Version>1.0.1</Version>
+	<Description>Task for running scripts on PowerShell. Requires PowerShell 7.0 to work.</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,8 +21,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+	<PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.1" />
   </ItemGroup>
 
 </Project>
