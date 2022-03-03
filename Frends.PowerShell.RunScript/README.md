@@ -6,10 +6,11 @@
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.PowerShell/Frends.PowerShell.RunScript|main)
 
 Run a PowerShell script with parameters, the Task fails when a terminating error is encountered or an error is thrown.
+Tests will change the PowerShell execution policy for the current user as unrestricted.
 
 ## Installing
 
-You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed
+You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed.
 
 
 ## Properties

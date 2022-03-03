@@ -70,6 +70,19 @@ namespace Frends.PowerShell.RunScript
             }
         }
 
+        /// <summary>
+        /// Executes a PowerShell command with parameters, leave parameter value empty for a switch.
+        /// This method is for testing and to enable running scripts on device
+        /// </summary>
+        /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
+        public static PowerShellResult RunCommand(string command, PowerShellParameter[] parameters, [Browsable(false)] RunOptions options)
+        {
+            return DoAndHandleSession(options?.Session, (session) =>
+            {
+                return ExecuteCommand(command, parameters, false, session.PowerShell);
+            });
+        }
+
         private static PowerShellResult ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters, bool logInformationStream,
             System.Management.Automation.PowerShell powershell)
         {
