@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFrameworks>net6.0</TargetFrameworks>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<IncludeSource>true</IncludeSource>
+	<AssemblyName>Frends.PowerShell.RunScript</AssemblyName>
+	<RootNamespace>Frends.PowerShell.RunScript</RootNamespace>
+    
+	<Version>1.0.1</Version>
+	<Authors>Frends</Authors>
+	<Copyright>Frends</Copyright>
+	<Company>Frends</Company>
+	<Product>Frends</Product>
+	<PackageTags>Frends</PackageTags>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<Description>Task for running scripts on PowerShell. Requires PowerShell 7.0 to work.</Description>
+	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.PowerShell/tree/main/Frends.PowerShell.RunScript</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+	<PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.1" />
+  </ItemGroup>
+
+</Project>
+

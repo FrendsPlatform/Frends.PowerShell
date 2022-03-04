@@ -1,0 +1,16 @@
+name: Frends.PowerShell.RunScript Release
+
+on:
+  workflow_dispatch:
+    paths:
+      paths:
+        - 'Frends.PowerShell.RunScript/**'
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/release.yml@main
+    with:
+      workdir: Frends.PowerShell.RunScript
+    secrets:
+      feed_api_key: ${{ secrets.TASKS_FEED_API_KEY }}
+      

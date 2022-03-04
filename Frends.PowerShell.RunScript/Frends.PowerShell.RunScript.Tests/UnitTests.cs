@@ -4,30 +4,32 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Frends.PowerShell.Tests
+namespace Frends.PowerShell.RunScript.Tests
 {
     [TestFixture]
-    public class PowerShellTests
+    public class UnitTests
     {
-        [Test]
-        public void RunCommand_ShouldRunCommandWithParameter()
+        /// <summary>
+        /// Setup initializes PowerShell ExecutionPolicy for CurrentUser as Unrestricted so the task can run running scripts.
+        /// </summary>
+        [OneTimeSetUp]
+        public void Setup()
         {
-            var result = PowerShell.RunCommand(new RunCommandInput
+            var command = "Set-ExecutionPolicy";
+            PowerShellParameter[] parameters = new PowerShellParameter[]
             {
-                Command = "New-TimeSpan",
-                Parameters = new[]
+                new PowerShellParameter
                 {
-                    new PowerShellParameter
-                    {
-                        Name = "Hours",
-                        Value = "1"
-                    },
+                    Name = "ExecutionPolicy",
+                    Value = "Unrestricted"
+                },
+                new PowerShellParameter
+                {
+                    Name = "Scope",
+                    Value = "CurrentUser"
                 }
-            },
-                new RunOptions());
-
-            Assert.That(result.Result, Is.Not.Null);
-            Assert.That(result.Result.Single(), Is.EqualTo(TimeSpan.FromHours(1)));
+            };
+            PowerShell.RunCommand(command, parameters, new RunOptions());
         }
 
         [Test]
@@ -39,50 +41,17 @@ write-output ""my test param: $testParam""";
 
             var result = PowerShell.RunScript(new RunScriptInput
             {
-                Parameters = new[] {new PowerShellParameter {Name = "testParam", Value = "my test param"}},
+                Parameters = new[] { new PowerShellParameter { Name = "testParam", Value = "my test param" } },
                 ReadFromFile = false,
-                Script = script
+                Script = script,
+                LogInformationStream = true
             }, new RunOptions());
 
             Assert.That(result.Result.Count, Is.EqualTo(2));
             Assert.That(result.Result.Last(), Is.EqualTo("my test param: my test param"));
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void RunCommand_ShouldRunCommandWithSwitchParameter(object switchParameterValue)
-        {
-            var session = PowerShell.CreateSession();
-            session.PowerShell.AddScript(@"
-function Test-Switch { 
-    param([switch] $switchy) 
-    $switchy.IsPresent 
-}", false);
-            session.PowerShell.Invoke();
-            session.PowerShell.Commands.Clear();
-
-            var result = PowerShell.RunCommand(new RunCommandInput
-            {
-                Command = "Test-Switch",
-                Parameters = new[]
-                    {
-                        new PowerShellParameter
-                        {
-                            Name = "switchy",
-                            Value = switchParameterValue
-                        }
-                    }
-            },
-                new RunOptions
-                {
-                    Session = session
-                });
-
-            Assert.That(result.Result.Single(), Is.EqualTo(switchParameterValue));
-        }
-
-
-        private string script =
+        private readonly string script =
             @"
 new-timespan -hours 1
 new-timespan -hours 2";
@@ -98,7 +67,8 @@ new-timespan -hours 2";
                 result = PowerShell.RunScript(new RunScriptInput
                 {
                     ReadFromFile = true,
-                    ScriptFilePath = scriptFilePath
+                    ScriptFilePath = scriptFilePath,
+                    LogInformationStream = true
                 }, new RunOptions());
             }
             finally
@@ -118,7 +88,8 @@ new-timespan -hours 2";
             result = PowerShell.RunScript(new RunScriptInput
             {
                 ReadFromFile = false,
-                Script = script
+                Script = script,
+                LogInformationStream = true
             }, new RunOptions());
 
 
@@ -133,7 +104,8 @@ new-timespan -hours 2";
             var result1 = PowerShell.RunScript(new RunScriptInput
             {
                 ReadFromFile = false,
-                Script = "$timespan = $timespan + (new-timespan -hours 1)"
+                Script = "$timespan = $timespan + (new-timespan -hours 1)",
+                LogInformationStream = true
             },
                 new RunOptions
                 {
@@ -141,10 +113,11 @@ new-timespan -hours 2";
                 });
 
             var result2 = PowerShell.RunScript(new RunScriptInput
-                {
-                    ReadFromFile = false,
-                    Script = "(new-timespan -hours 1) + $timespan"
-                },
+            {
+                ReadFromFile = false,
+                Script = "(new-timespan -hours 1) + $timespan",
+                LogInformationStream = true
+            },
                 new RunOptions
                 {
                     Session = session
@@ -156,12 +129,26 @@ new-timespan -hours 2";
         [Test]
         public void RunScript_ShouldListErrors()
         {
-            var script = 
-@"This-DoesNotExist
+            var script =
+@"
+This-DoesNotExist
+$Source = @""
+using System; 
+namespace test {
+    public static class pstest {
+        public static void test`(`) {
+        throw new Exception(""Argh""); 
+        }
+    }
+}
+""@
+
+Add-Type -TypeDefinition $Source -Language CSharp
+[test.pstest]::test()
 get-process -name doesnotexist -ErrorAction Stop
 ";
 
-            var resultError = Assert.Throws<Exception>(() => PowerShell.RunScript(new RunScriptInput {ReadFromFile = false, Script = script}, null));
+            var resultError = Assert.Throws<Exception>(() => PowerShell.RunScript(new RunScriptInput { ReadFromFile = false, Script = script, LogInformationStream = true }, null));
 
             Assert.That(resultError.Message, Is.Not.Null);
         }
@@ -178,7 +165,8 @@ $test
             var result = PowerShell.RunScript(new RunScriptInput
             {
                 ReadFromFile = false,
-                Script = script
+                Script = script,
+                LogInformationStream = true
             }, null);
 
             Assert.That(result.Result[0].Property1, Is.EqualTo("Value1"));

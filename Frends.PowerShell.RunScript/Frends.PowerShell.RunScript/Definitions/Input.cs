@@ -2,12 +2,10 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frends.PowerShell
+#pragma warning disable 1591
+
+namespace Frends.PowerShell.RunScript
 {
-    public class RunCommandInput {
-        public string Command { get; set; }
-        public PowerShellParameter[] Parameters { get; set; }
-    }
 
     public class PowerShellParameter
     {
@@ -18,15 +16,33 @@ namespace Frends.PowerShell
 
     public class RunScriptInput
     {
-        public PowerShellParameter[] Parameters { get;set; }
+        /// <summary>
+        ///  Parameters for the script, provided switch parameters need to have a boolean value
+        /// </summary>
+        public PowerShellParameter[] Parameters { get; set; }
+
+        /// <summary>
+        /// Should the script be read from a file or from the Script parameter
+        /// </summary>
         public bool ReadFromFile { get; set; }
 
+        /// <summary>
+        /// Location for the script file
+        /// </summary>
         [UIHint(nameof(ReadFromFile), "", true)]
         public string ScriptFilePath { get; set; }
 
+        /// <summary>
+        /// The script to execute 
+        /// </summary>
         [UIHint(nameof(ReadFromFile), "", false)]
         public string Script { get; set; }
 
+        /// <summary>
+        /// Should the information stream be logged. If false, log will be an empty string.
+        /// If set to true, a lot of string data may be logged. Use with caution.
+        /// </summary>
+        public bool LogInformationStream { get; set; }
     }
 
     public class RunOptions

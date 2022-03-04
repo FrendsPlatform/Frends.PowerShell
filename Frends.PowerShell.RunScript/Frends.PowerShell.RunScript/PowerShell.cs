@@ -1,63 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Runtime.CompilerServices;
+using System.Text;
 
-[assembly: InternalsVisibleTo("Frends.PowerShell.Tests")]
-namespace Frends.PowerShell
+#pragma warning disable 1591
+
+[assembly: InternalsVisibleTo("Frends.PowerShell.RunScript.Tests")]
+namespace Frends.PowerShell.RunScript
 {
-    /// <summary>
-    /// Wraps the powershell session
-    /// </summary>
-    public class SessionWrapper : IDisposable
-    {
-        internal Runspace Runspace;
-        internal System.Management.Automation.PowerShell PowerShell;
-
-        public SessionWrapper()
-        {
-            var host = new TaskPowershellHost();
-            Runspace = RunspaceFactory.CreateRunspace(host);
-            PowerShell = System.Management.Automation.PowerShell.Create();
-
-            Runspace.Open();
-            PowerShell.Runspace = Runspace;
-        }
-
-        private void ReleaseUnmanagedResources()
-        {
-            try
-            {
-                PowerShell?.Dispose();
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine($"Encountered error while disposing powershell session: {e}");
-            }
-            PowerShell = null;
-
-            try
-            {
-                Runspace?.Dispose();
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine($"Encountered error while disposing powershell runspace: {e}");
-            }
-            Runspace = null;
-        }
-
-        public void Dispose()
-        {
-            ReleaseUnmanagedResources();
-            GC.SuppressFinalize(this);
-        }
-    }
 
     public static class PowerShell
     {
@@ -88,9 +43,9 @@ namespace Frends.PowerShell
                 var tempScript = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.ps1");
                 try
                 {
-                    File.WriteAllText(tempScript, script);
+                    File.WriteAllText(tempScript, script, Encoding.UTF8);
 
-                    return ExecuteCommand(tempScript, input.Parameters, session.PowerShell);
+                    return ExecuteCommand(tempScript, input.Parameters, input.LogInformationStream, session.PowerShell);
                 }
                 finally
                 {
@@ -116,19 +71,19 @@ namespace Frends.PowerShell
         }
 
         /// <summary>
-        /// Executes a PowerShell command with parameters, leave parameter value empty for a switch
+        /// Executes a PowerShell command with parameters, leave parameter value empty for a switch.
+        /// This method is for testing and to enable running scripts on device
         /// </summary>
         /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
-        public static PowerShellResult RunCommand(RunCommandInput input, [Browsable(false)]RunOptions options)
+        public static PowerShellResult RunCommand(string command, PowerShellParameter[] parameters, [Browsable(false)] RunOptions options)
         {
             return DoAndHandleSession(options?.Session, (session) =>
             {
-                return ExecuteCommand(input.Command, input.Parameters, session.PowerShell);
+                return ExecuteCommand(command, parameters, false, session.PowerShell);
             });
-
         }
 
-        private static PowerShellResult ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters,
+        private static PowerShellResult ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters, bool logInformationStream,
             System.Management.Automation.PowerShell powershell)
         {
             var command = new Command(inputCommand, isScript: false, useLocalScope: false);
@@ -143,7 +98,7 @@ namespace Frends.PowerShell
 
             powershell.Commands.AddCommand(command);
 
-            return ExecutePowershell(powershell);
+            return ExecutePowershell(powershell, logInformationStream);
         }
 
         private static IList<string> GetErrorMessages(PSDataCollection<ErrorRecord> errors)
@@ -151,7 +106,7 @@ namespace Frends.PowerShell
             return errors.Select(err => $"{err.ScriptStackTrace}: {err.Exception.Message}").ToList();
         }
 
-        private static PowerShellResult ExecutePowershell(System.Management.Automation.PowerShell powershell)
+        private static PowerShellResult ExecutePowershell(System.Management.Automation.PowerShell powershell, bool logInformationStream)
         {
             try
             {
@@ -161,7 +116,7 @@ namespace Frends.PowerShell
                     // Powershell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
                     Result = execution?.Select(GetResultObject).ToList(),
                     Errors = GetErrorMessages(powershell.Streams.Error),
-                    Log = string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
+                    Log = logInformationStream == false ? "" : string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
                 };
 
                 return result;
