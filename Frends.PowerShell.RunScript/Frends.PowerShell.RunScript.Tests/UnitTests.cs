@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 
 namespace Frends.PowerShell.RunScript.Tests
@@ -30,7 +29,7 @@ namespace Frends.PowerShell.RunScript.Tests
                     Value = "CurrentUser"
                 }
             };
-            _ = PowerShell.RunCommand(command, parameters, new RunOptions());
+            PowerShell.RunCommand(command, parameters, new RunOptions());
         }
 
         [Test]
@@ -48,8 +47,8 @@ write-output ""my test param: $testParam""";
                 LogInformationStream = true
             }, new RunOptions());
 
-            NUnit.Framework.Assert.That(result.Result.Count, Is.EqualTo(2));
-            NUnit.Framework.Assert.That(result.Result.Last(), Is.EqualTo("my test param: my test param"));
+            Assert.That(result.Result.Count, Is.EqualTo(2));
+            Assert.That(result.Result.Last(), Is.EqualTo("my test param: my test param"));
         }
 
         private readonly string script =
@@ -77,8 +76,8 @@ new-timespan -hours 2";
                 File.Delete(scriptFilePath);
             }
 
-            NUnit.Framework.Assert.That(result.Result.Count, Is.EqualTo(2));
-            NUnit.Framework.Assert.That(result.Result.Last(), Is.EqualTo(TimeSpan.FromHours(2)));
+            Assert.That(result.Result.Count, Is.EqualTo(2));
+            Assert.That(result.Result.Last(), Is.EqualTo(TimeSpan.FromHours(2)));
         }
 
         [Test]
@@ -94,7 +93,7 @@ new-timespan -hours 2";
             }, new RunOptions());
 
 
-            NUnit.Framework.Assert.That(result.Result.Last(), Is.EqualTo(TimeSpan.FromHours(2)));
+            Assert.That(result.Result.Last(), Is.EqualTo(TimeSpan.FromHours(2)));
         }
 
         [Test]
@@ -124,7 +123,7 @@ new-timespan -hours 2";
                     Session = session
                 });
 
-            NUnit.Framework.Assert.That(result2.Result.Single(), Is.EqualTo(TimeSpan.FromHours(2)));
+            Assert.That(result2.Result.Single(), Is.EqualTo(TimeSpan.FromHours(2)));
         }
 
         [Test]
@@ -149,9 +148,9 @@ Add-Type -TypeDefinition $Source -Language CSharp
 get-process -name doesnotexist -ErrorAction Stop
 ";
 
-            var resultError = NUnit.Framework.Assert.Throws<Exception>(() => PowerShell.RunScript(new RunScriptInput { ReadFromFile = false, Script = script, LogInformationStream = true }, null));
+            var resultError = Assert.Throws<Exception>(() => PowerShell.RunScript(new RunScriptInput { ReadFromFile = false, Script = script, LogInformationStream = true }, null));
 
-            NUnit.Framework.Assert.That(resultError.Message, Is.Not.Null);
+            Assert.That(resultError.Message, Is.Not.Null);
         }
 
         [Test]
@@ -170,8 +169,8 @@ $test
                 LogInformationStream = true
             }, null);
 
-            NUnit.Framework.Assert.That(result.Result[0].Property1, Is.EqualTo("Value1"));
-            NUnit.Framework.Assert.That(result.Result[0].Property2, Is.EqualTo("Value2"));
+            Assert.That(result.Result[0].Property1, Is.EqualTo("Value1"));
+            Assert.That(result.Result[0].Property2, Is.EqualTo("Value2"));
         }
     }
 }
