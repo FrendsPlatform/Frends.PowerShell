@@ -16,7 +16,7 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<Description>Task for running scripts on PowerShell. Requires PowerShell 7.0 to work.</Description>
-	<PackageProjectUrl>https://github.com/FrendsPlatform/Frends.PowerShell</PackageProjectUrl>
+	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.PowerShell/tree/main/Frends.PowerShell.RunScript</RepositoryUrl>
   </PropertyGroup>
 
