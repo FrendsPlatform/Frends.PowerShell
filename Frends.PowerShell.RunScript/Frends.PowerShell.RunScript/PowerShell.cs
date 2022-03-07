@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Runtime.CompilerServices;
@@ -27,8 +23,11 @@ namespace Frends.PowerShell.RunScript
         }
 
         /// <summary>
-        /// Executes a PowerShell script from a file or the script parameter
+        /// Executes a PowerShell script from a file or the script parameter.
+        /// [Documentation] (https://github.com/FrendsPlatform/Frends.PowerShell/tree/master/Frends.PowerShell.RunScript)
         /// </summary>
+        /// <param name="input">RunScriptInput</param>
+        /// <param name="options">RunOptions</param>
         /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
         public static PowerShellResult RunScript(RunScriptInput input, [Browsable(false)]RunOptions options)
         {
@@ -72,9 +71,8 @@ namespace Frends.PowerShell.RunScript
 
         /// <summary>
         /// Executes a PowerShell command with parameters, leave parameter value empty for a switch.
-        /// This method is for testing and to enable running scripts on device
+        /// This method is for testing and to enable running scripts on device.
         /// </summary>
-        /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
         public static PowerShellResult RunCommand(string command, PowerShellParameter[] parameters, [Browsable(false)] RunOptions options)
         {
             return DoAndHandleSession(options?.Session, (session) =>

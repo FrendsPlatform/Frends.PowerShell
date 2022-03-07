@@ -37,8 +37,11 @@ namespace Frends.PowerShell.RunCommand
         }
 
         /// <summary>
-        /// Executes a PowerShell command with parameters, leave parameter value empty for a switch
+        /// Executes a PowerShell command with parameters, leave parameter value empty for a switch.
+        /// [Documentation] (https://github.com/FrendsPlatform/Frends.PowerShell/tree/master/Frends.PowerShell.RunCommand)
         /// </summary>
+        /// <param name="input">RunCommandInput includes string command, parameters for the command and boolean value for LogInformationStream</param>
+        /// <param name="options">RunOptions</param>
         /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
         public static PowerShellResult RunCommand(RunCommandInput input, [Browsable(false)] RunOptions options)
         {
