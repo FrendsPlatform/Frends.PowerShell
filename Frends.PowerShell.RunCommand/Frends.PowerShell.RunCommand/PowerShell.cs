@@ -2,14 +2,12 @@
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 #pragma warning disable 1591
 
-[assembly: InternalsVisibleTo("Frends.PowerShell.RunScript.Tests")]
-namespace Frends.PowerShell.RunScript
+[assembly: InternalsVisibleTo("Frends.PowerShell.RunCommand.Tests")]
+namespace Frends.PowerShell.RunCommand
 {
-
     public static class PowerShell
     {
         /// <summary>
@@ -20,37 +18,6 @@ namespace Frends.PowerShell.RunScript
         {
             // Leave this internal for now, turn public to support shared sessions between task executions
             return new SessionWrapper();
-        }
-
-        /// <summary>
-        /// Executes a PowerShell script from a file or the script parameter.
-        /// [Documentation] (https://github.com/FrendsPlatform/Frends.PowerShell/tree/master/Frends.PowerShell.RunScript)
-        /// </summary>
-        /// <param name="input">RunScriptInput</param>
-        /// <param name="options">RunOptions</param>
-        /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
-        public static PowerShellResult RunScript(RunScriptInput input, [Browsable(false)]RunOptions options)
-        {
-            return DoAndHandleSession(options?.Session, session =>
-            {
-                var script = input.Script;
-                if (input.ReadFromFile)
-                {
-                    script = File.ReadAllText(input.ScriptFilePath);
-                }
-
-                var tempScript = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.ps1");
-                try
-                {
-                    File.WriteAllText(tempScript, script, Encoding.UTF8);
-
-                    return ExecuteCommand(tempScript, input.Parameters, input.LogInformationStream, session.PowerShell);
-                }
-                finally
-                {
-                    File.Delete(tempScript);
-                }
-            });
         }
 
         private static PowerShellResult DoAndHandleSession(SessionWrapper sessionFromOutside, Func<SessionWrapper, PowerShellResult> action)
@@ -71,14 +38,18 @@ namespace Frends.PowerShell.RunScript
 
         /// <summary>
         /// Executes a PowerShell command with parameters, leave parameter value empty for a switch.
-        /// This method is for testing and to enable running scripts on device.
+        /// [Documentation] (https://github.com/FrendsPlatform/Frends.PowerShell/tree/master/Frends.PowerShell.RunCommand)
         /// </summary>
-        public static PowerShellResult RunCommand(string command, PowerShellParameter[] parameters, [Browsable(false)] RunOptions options)
+        /// <param name="input">RunCommandInput includes string command, parameters for the command and boolean value for LogInformationStream</param>
+        /// <param name="options">RunOptions</param>
+        /// <returns>Object { Result: List&lt;dynamic&gt;, Errors: List&lt;string&gt;, Log: string}</returns>
+        public static PowerShellResult RunCommand(RunCommandInput input, [Browsable(false)] RunOptions options)
         {
             return DoAndHandleSession(options?.Session, (session) =>
             {
-                return ExecuteCommand(command, parameters, false, session.PowerShell);
+                return ExecuteCommand(input.Command, input.Parameters, input.LogInformationStream, session.PowerShell);
             });
+
         }
 
         private static PowerShellResult ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters, bool logInformationStream,

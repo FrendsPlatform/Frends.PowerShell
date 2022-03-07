@@ -1,0 +1,21 @@
+name: Frends.PowerShell.RunCommand Main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.PowerShell.RunCommand/**'
+  workflow_dispatch:
+    paths:
+      - 'Frends.PowerShell.RunCommand/**'
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
+    with:
+      workdir: Frends.PowerShell.RunCommand
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      
