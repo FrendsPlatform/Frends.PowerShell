@@ -1,0 +1,18 @@
+name: Frends.PowerShell.RunCommand Release
+
+on:
+  workflow_dispatch:
+    paths:
+      paths:
+        - 'Frends.PowerShell.RunCommand/**'
+        
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/release.yml@main
+    with:
+      workdir: Frends.PowerShell.RunCommand
+    secrets:
+      feed_api_key: ${{ secrets.TASKS_FEED_API_KEY }}
+      
