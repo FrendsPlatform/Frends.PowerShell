@@ -5,6 +5,7 @@ Frends tasks for regular expressions.
 # Tasks
 
 - [Frends.PowerShell.Runscript](Frends.PowerShell.RunScript/README.md)
+- [Frends.PowerShell.RunCommand](Frends.PowerShell.RunCommand/README.md)
 
 # Contributing
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
