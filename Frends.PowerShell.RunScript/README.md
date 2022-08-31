@@ -2,9 +2,9 @@
 Run a PowerShell script with parameters, the Task fails when a terminating error is encountered or an error is thrown.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) 
-[![Build](https://github.com/FrendsPlatform/Frends.Zip/actions/workflows/CreateArchive_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Zip/actions)
-![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.Zip.CreateArchive)
-![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.Zip/Frends.Zip.CreateArchive|main)
+[![Build](https://github.com/FrendsPlatform/Frends.PowerShell/actions/workflows/Runscript_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.PowerShell/actions)
+![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.PowerShell.Runscript)
+![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.PowerShell/Frends.PowerShell.Runscript|main)
 
 # Installing
 
