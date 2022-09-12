@@ -10,7 +10,6 @@ on:
     paths:
       - 'Frends.PowerShell.RunCommand/**'
   
-
 jobs:
   build:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
@@ -18,4 +17,3 @@ jobs:
       workdir: Frends.PowerShell.RunCommand
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
-      
