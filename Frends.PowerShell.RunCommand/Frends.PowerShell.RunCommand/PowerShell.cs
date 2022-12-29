@@ -2,7 +2,9 @@
 using System.ComponentModel;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Loader;
 
 [assembly: InternalsVisibleTo("Frends.PowerShell.RunCommand.Tests")]
 namespace Frends.PowerShell.RunCommand;
@@ -12,6 +14,15 @@ namespace Frends.PowerShell.RunCommand;
 /// </summary>
 public static class PowerShell
 {
+    /// For mem cleanup.
+    static PowerShell()
+    {
+        var currentAssembly = Assembly.GetExecutingAssembly();
+        var currentContext = AssemblyLoadContext.GetLoadContext(currentAssembly);
+        if (currentContext != null)
+            currentContext.Unloading += OnPluginUnloadingRequested;
+    }
+
     /// <summary>
     /// Executes a PowerShell command with parameters, leave parameter value empty for a switch.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.PowerShell.RunCommande)
@@ -31,7 +42,7 @@ public static class PowerShell
     {
         var command = new Command(inputCommand, isScript: false, useLocalScope: false);
 
-        foreach (var parameter in powerShellParameters ?? new PowerShellParameter[] { })
+        foreach (var parameter in powerShellParameters ?? Array.Empty<PowerShellParameter>())
         {
             var parameterName = parameter.Name.Trim('-', ' '); // Remove dash from start
 
@@ -100,5 +111,9 @@ public static class PowerShell
         {
             internalSession?.Dispose();
         }
+    }
+    private static void OnPluginUnloadingRequested(AssemblyLoadContext obj)
+    {
+        obj.Unloading -= OnPluginUnloadingRequested;
     }
 }
