@@ -1,10 +1,7 @@
-name: Frends.PowerShell.RunCommand Release
+name: RunCommand_Release
 
 on:
   workflow_dispatch:
-    paths:
-      paths:
-        - 'Frends.PowerShell.RunCommand/**'
         
 jobs:
   build:

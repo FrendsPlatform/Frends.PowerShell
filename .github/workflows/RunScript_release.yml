@@ -1,10 +1,7 @@
-name: Frends.PowerShell.RunScript Release
+name: RunScript_Release
 
 on:
   workflow_dispatch:
-    paths:
-      paths:
-        - 'Frends.PowerShell.RunScript/**'
 
 jobs:
   build:
