@@ -7,7 +7,7 @@
 	<AssemblyName>Frends.PowerShell.RunCommand</AssemblyName>
 	<RootNamespace>Frends.PowerShell.RunCommand</RootNamespace>
 
-	<Version>1.0.2</Version>
+	<Version>1.1.0</Version>
 	<Authors>Frends</Authors>
 	<Copyright>Frends</Copyright>
 	<Company>Frends</Company>
@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	<PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.1" />
+	<PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.23" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.0] - 2024-10-08
+### Changed
+- Updated PowerShell version to 7.2.23
+
  [1.0.2] - 2022-12-21
 ### Changed
 - Memory leak fix.
