@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.0] - 2024-10-09
+### Changed
+- Added explicit reference to Microsoft.Management.Infrastructure
+
 ## [1.1.0] - 2024-10-08
 ### Changed
 - Updated PowerShell version to 7.2.23
