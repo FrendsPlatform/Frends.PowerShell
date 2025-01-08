@@ -5,6 +5,7 @@ using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Text;
 
@@ -65,13 +66,11 @@ public static class PowerShell
     {
         List<dynamic> results = new();
         List<string> errors = new();
-
-
-
+        
         using Process process = new();
         process.StartInfo = new()
         {
-            FileName = "powershell.exe",
+            FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "powershell" : "pwsh",
             Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptPath}\" ",
             UseShellExecute = false,
             CreateNoWindow = true,
@@ -79,17 +78,18 @@ public static class PowerShell
             RedirectStandardOutput = true,
         };
 
-        process.OutputDataReceived += (sender, args) =>
+        void ProcessOutputReceiver(object sender, DataReceivedEventArgs args)
         {
             if (!string.IsNullOrWhiteSpace(args.Data))
                 results.Add(args.Data);
         };
-
-        process.ErrorDataReceived += (sender, args) =>
+        void ProcessErrorReceiver(object sender, DataReceivedEventArgs args)
         {
             if (!string.IsNullOrWhiteSpace(args.Data))
                 errors.Add(args.Data);
         };
+        process.OutputDataReceived += ProcessOutputReceiver;
+        process.ErrorDataReceived += ProcessErrorReceiver;
 
         try
         {
@@ -105,6 +105,8 @@ public static class PowerShell
         finally
         {
             if (!process.HasExited) process.Kill();
+            process.OutputDataReceived -= ProcessOutputReceiver;
+            process.ErrorDataReceived -= ProcessErrorReceiver;
             process.Close();
         }
 
