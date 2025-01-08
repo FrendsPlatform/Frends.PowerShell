@@ -26,6 +26,14 @@ public class RunCommandInput
     /// <example>false</example>
     [DefaultValue(false)]
     public bool LogInformationStream { get; set; }
+
+    /// <summary>
+    /// Define which version of PowerShell to use.
+    /// Useful in more complex scripts, as default version supports only basic usage
+    /// </summary>
+    /// <example>false</example>
+    [DefaultValue(false)]
+    public bool ExecuteNativeShell { get; set; }
 }
 
 /// <summary>

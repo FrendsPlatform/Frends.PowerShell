@@ -30,6 +30,29 @@ public class UnitTests
     }
 
     [Test]
+    public void RunScript_ShouldRunFromNativeShell()
+    {
+        var script = @"
+        param([string]$testParam)
+        echo ""Start of process""
+        write-output ""my test param: $testParam""
+        ";
+        
+        var result = PowerShell.RunScript(new RunScriptInput
+        {
+            Parameters = new[] { new PowerShellParameter { Name = "testParam", Value = "my test param" } },
+            ReadFromFile = false,
+            Script = script,
+            LogInformationStream = true,
+            ExecuteNativeShell = true
+        }, new RunOptions(), default);
+
+        Assert.That(result.Result.Count, Is.AtLeast(2));
+        Assert.That(result.Result.First(), Is.EqualTo("Start of process"));
+        Assert.That(result.Result.Last(), Is.EqualTo("my test param: my test param"));
+    }
+
+    [Test]
     public void RunScript_ShouldRunScriptWithParameter()
     {
         var script = @"param([string]$testParam)

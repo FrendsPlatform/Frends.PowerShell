@@ -1,10 +1,12 @@
 ﻿using Frends.PowerShell.RunCommand.Definitions;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
+using System.Text;
 
 [assembly: InternalsVisibleTo("Frends.PowerShell.RunCommand.Tests")]
 namespace Frends.PowerShell.RunCommand;
@@ -34,8 +36,75 @@ public static class PowerShell
     {
         return DoAndHandleSession(options?.Session, (session) =>
         {
+            if (input.ExecuteNativeShell){
+                var tempScript = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.ps1");
+                try
+                {
+                    string parameterString = string.Empty;
+                    if (input.Parameters != null)
+                    {
+                        foreach (var param in input.Parameters)
+                        {
+                            parameterString += $"-{param.Name} \"{param.Value}\" ";
+                        }
+                    }
+                    File.WriteAllText(tempScript, $"{input.Command} {parameterString}", Encoding.UTF8);
+                    return ExecuteProcess(tempScript, input.Parameters);
+                }
+                finally
+                {
+                    File.Delete(tempScript);
+                }
+            } else
             return ExecuteCommand(input.Command, input.Parameters, input.LogInformationStream, session.PowerShell);
         });
+    }
+        private static PowerShellResult ExecuteProcess(string scriptPath, PowerShellParameter[] parameters){
+        List<dynamic> results = new();
+        List<string> errors = new();
+
+        
+
+        using Process process = new();
+        process.StartInfo = new()
+        {
+            FileName = "powershell.exe",
+            Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptPath}\" ",
+            UseShellExecute = false,CreateNoWindow = true,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+        };
+
+        process.OutputDataReceived += (sender, args) =>
+        {
+            if (!string.IsNullOrWhiteSpace(args.Data))
+                results.Add(args.Data);
+        };
+
+        process.ErrorDataReceived += (sender, args) =>
+        {
+            if (!string.IsNullOrWhiteSpace(args.Data))
+                errors.Add(args.Data);
+        };
+
+        try
+        {
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+        }
+        catch (Exception ex)
+        {
+            errors.Add($"Exception occurred while running the script: {ex.Message}");
+        }
+        finally
+        {
+            process.Close();
+        }
+
+        return new PowerShellResult(results, errors, string.Empty);
+
     }
 
     private static PowerShellResult ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters, bool logInformationStream, System.Management.Automation.PowerShell powershell)
