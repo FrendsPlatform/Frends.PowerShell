@@ -44,9 +44,9 @@ public static class PowerShell
             {
                 File.WriteAllText(tempScript, script, Encoding.UTF8);
                 if (input.ExecuteNativeShell)
-                return ExecuteProcess(tempScript, input.Parameters);
-                else 
-                return ExecuteCommand(tempScript, input.Parameters, input.LogInformationStream, session.PowerShell, cancellationToken);
+                    return ExecuteProcess(tempScript, input.Parameters);
+                else
+                    return ExecuteCommand(tempScript, input.Parameters, input.LogInformationStream, session.PowerShell, cancellationToken);
             }
             finally
             {
@@ -55,7 +55,8 @@ public static class PowerShell
         });
     }
 
-    private static PowerShellResult ExecuteProcess(string scriptPath, PowerShellParameter[] parameters){
+    private static PowerShellResult ExecuteProcess(string scriptPath, PowerShellParameter[] parameters)
+    {
         List<dynamic> results = new();
         List<string> errors = new();
 
@@ -73,7 +74,8 @@ public static class PowerShell
         {
             FileName = "powershell.exe",
             Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptPath}\" {parameterString}",
-            UseShellExecute = false,CreateNoWindow = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
             RedirectStandardError = true,
             RedirectStandardOutput = true,
         };
