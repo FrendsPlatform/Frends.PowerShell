@@ -36,7 +36,8 @@ public static class PowerShell
     {
         return DoAndHandleSession(options?.Session, (session) =>
         {
-            if (input.ExecuteNativeShell){
+            if (input.ExecuteNativeShell)
+            {
                 var tempScript = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.ps1");
                 try
                 {
@@ -55,22 +56,25 @@ public static class PowerShell
                 {
                     File.Delete(tempScript);
                 }
-            } else
-            return ExecuteCommand(input.Command, input.Parameters, input.LogInformationStream, session.PowerShell);
+            }
+            else
+                return ExecuteCommand(input.Command, input.Parameters, input.LogInformationStream, session.PowerShell);
         });
     }
-        private static PowerShellResult ExecuteProcess(string scriptPath, PowerShellParameter[] parameters){
+    private static PowerShellResult ExecuteProcess(string scriptPath, PowerShellParameter[] parameters)
+    {
         List<dynamic> results = new();
         List<string> errors = new();
 
-        
+
 
         using Process process = new();
         process.StartInfo = new()
         {
             FileName = "powershell.exe",
             Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptPath}\" ",
-            UseShellExecute = false,CreateNoWindow = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
             RedirectStandardError = true,
             RedirectStandardOutput = true,
         };
@@ -133,7 +137,7 @@ public static class PowerShell
         try
         {
             var execution = powershell.Invoke();
-            var result = new PowerShellResult (
+            var result = new PowerShellResult(
                 // Powershell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
                 execution?.Select(GetResultObject).ToList(),
                 GetErrorMessages(powershell.Streams.Error),

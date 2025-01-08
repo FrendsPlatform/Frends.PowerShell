@@ -31,7 +31,7 @@ public class TaskUserInterfaceTests
         Assert.AreEqual("", taskUserInterface.ReadLine());
         Assert.AreEqual(1, taskUserInterface.PromptForChoice("Caption", "Message", new Collection<ChoiceDescription>(), 1));
 
-        var answer = taskUserInterface.Prompt("Caption", "Message", new Collection<FieldDescription> { new ("Name") });
+        var answer = taskUserInterface.Prompt("Caption", "Message", new Collection<FieldDescription> { new("Name") });
         Assert.AreEqual(1, answer.Count);
 
         Assert.Throws<NotImplementedException>(() => taskUserInterface.PromptForCredential("Caption", "Message", "UserName", "TargetName"));
