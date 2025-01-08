@@ -104,6 +104,7 @@ public static class PowerShell
         }
         finally
         {
+            if (!process.HasExited) process.Kill();
             process.Close();
         }
 
