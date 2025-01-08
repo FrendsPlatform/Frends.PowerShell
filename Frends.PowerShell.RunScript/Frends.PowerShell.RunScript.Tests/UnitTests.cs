@@ -37,7 +37,7 @@ public class UnitTests
         echo ""Start of process""
         write-output ""my test param: $testParam""
         ";
-        
+
         var result = PowerShell.RunScript(new RunScriptInput
         {
             Parameters = new[] { new PowerShellParameter { Name = "testParam", Value = "my test param" } },
