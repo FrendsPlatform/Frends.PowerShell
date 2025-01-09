@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.0] - 2025-01-08
+### Added
+- Added option to run script using native PowerShell
+
 ## [1.2.0] - 2024-10-09
 ### Changed
 - Added explicit reference to Microsoft.Management.Infrastructure

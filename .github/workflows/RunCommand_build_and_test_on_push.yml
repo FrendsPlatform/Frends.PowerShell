@@ -5,11 +5,11 @@ on:
     branches-ignore:
       - main
     paths:
-      - 'Frends.PowerShell.RunCommand/**'
+      - "Frends.PowerShell.RunCommand/**"
   workflow_dispatch:
     paths:
-      - 'Frends.PowerShell.RunCommand/**'
-  
+      - "Frends.PowerShell.RunCommand/**"
+
 jobs:
   build:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/build_test.yml@main

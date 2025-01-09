@@ -62,4 +62,28 @@ function Test-Switch {
 
         Assert.That(result.Result.Single(), Is.EqualTo(switchParameterValue));
     }
+
+    [Test]
+    public void RunScript_ShouldRunFromNativeShell()
+    {
+        var result = PowerShell.RunCommand(new RunCommandInput
+        {
+            Command = "New-TimeSpan",
+            Parameters = new[]
+            {
+                new PowerShellParameter
+                {
+                    Name = "Days",
+                    Value = "1"
+                },
+            },
+            ExecuteNativeShell = true
+        },
+        new RunOptions());
+
+        StringAssert.Contains("1", result.Result.First());
+        Assert.That(result.Result.Count, Is.EqualTo(11));
+
+    }
+
 }

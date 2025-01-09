@@ -1,9 +1,11 @@
 ﻿using Frends.PowerShell.RunScript.Definitions;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Text;
 
@@ -42,13 +44,77 @@ public static class PowerShell
             try
             {
                 File.WriteAllText(tempScript, script, Encoding.UTF8);
-                return ExecuteCommand(tempScript, input.Parameters, input.LogInformationStream, session.PowerShell, cancellationToken);
+                if (input.ExecuteNativeShell)
+                    return ExecuteProcess(tempScript, input.Parameters);
+                else
+                    return ExecuteCommand(tempScript, input.Parameters, input.LogInformationStream, session.PowerShell, cancellationToken);
             }
             finally
             {
                 File.Delete(tempScript);
             }
         });
+    }
+
+    private static PowerShellResult ExecuteProcess(string scriptPath, PowerShellParameter[] parameters)
+    {
+        List<dynamic> results = new();
+        List<string> errors = new();
+
+        string parameterString = string.Empty;
+        if (parameters != null)
+        {
+            foreach (var param in parameters)
+            {
+                parameterString += $"-{param.Name} \"{param.Value}\" ";
+            }
+        }
+
+        using Process process = new();
+        process.StartInfo = new()
+        {
+            FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "powershell" : "pwsh",
+            Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptPath}\" {parameterString}",
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+        };
+
+        void ProcessOutputReceiver(object sender, DataReceivedEventArgs args)
+        {
+            if (!string.IsNullOrWhiteSpace(args.Data))
+                results.Add(args.Data);
+        };
+        void ProcessErrorReceiver(object sender, DataReceivedEventArgs args)
+        {
+            if (!string.IsNullOrWhiteSpace(args.Data))
+                errors.Add(args.Data);
+        };
+        process.OutputDataReceived += ProcessOutputReceiver;
+        process.ErrorDataReceived += ProcessErrorReceiver;
+
+        try
+        {
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+        }
+        catch (Exception ex)
+        {
+            errors.Add($"Exception occurred while running the script: {ex.Message}");
+        }
+        finally
+        {
+            if (!process.HasExited) process.Kill();
+            process.OutputDataReceived -= ProcessOutputReceiver;
+            process.ErrorDataReceived -= ProcessErrorReceiver;
+            process.Close();
+        }
+
+        return new PowerShellResult(results, errors, string.Empty);
+
     }
 
     private static PowerShellResult ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters, bool logInformationStream, System.Management.Automation.PowerShell powershell, CancellationToken cancellationToken)
