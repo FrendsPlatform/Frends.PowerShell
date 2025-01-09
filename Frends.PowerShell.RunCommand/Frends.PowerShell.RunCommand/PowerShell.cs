@@ -66,7 +66,7 @@ public static class PowerShell
     {
         List<dynamic> results = new();
         List<string> errors = new();
-        
+
         using Process process = new();
         process.StartInfo = new()
         {
