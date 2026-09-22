@@ -167,4 +167,71 @@ $test
         Assert.That(result.Result[0].Property1, Is.EqualTo("Value1"));
         Assert.That(result.Result[0].Property2, Is.EqualTo("Value2"));
     }
+
+    /// <summary>
+    /// Reproduces the error reported by a customer trying to import Windows modules
+    /// (e.g. ActiveDirectory) that ship type extension (`types.ps1xml`) data whose code
+    /// property getter does not match PowerShell's required signature (public, static,
+    /// non-void, single PSObject parameter). Instead of failing the module import outright,
+    /// PowerShell reports the malformed member as a (non-terminating) error while the rest
+    /// of the type data still loads, so the failure only surfaces once the offending member
+    /// is actually accessed.
+    /// </summary>
+    [Test]
+    public void RunScript_ShouldReportErrorForModuleWithInvalidCodePropertyGetter()
+    {
+        var typesFilePath = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.types.ps1xml");
+        var typesXml =
+$@"<?xml version=""1.0"" encoding=""utf-8""?>
+<Types>
+  <Type>
+    <Name>System.String</Name>
+    <Members>
+      <CodeProperty>
+        <Name>InvalidGetter</Name>
+        <GetCodeReference>
+          <TypeName>{typeof(InvalidCodePropertyGetterProvider).AssemblyQualifiedName}</TypeName>
+          <MethodName>{nameof(InvalidCodePropertyGetterProvider.GetValue)}</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+    </Members>
+  </Type>
+</Types>";
+
+        PowerShellResult result;
+        try
+        {
+            File.WriteAllText(typesFilePath, typesXml);
+
+            var script =
+$@"Update-TypeData -AppendPath '{typesFilePath}'
+""hello"".InvalidGetter";
+
+            result = PowerShell.RunScript(new RunScriptInput
+            {
+                ReadFromFile = false,
+                Script = script,
+                LogInformationStream = true
+            }, null, default);
+        }
+        finally
+        {
+            File.Delete(typesFilePath);
+        }
+
+        Assert.That(result.Errors, Has.Some.Contains(
+            "The getter method should be public, not void, static, and have one parameter of the type PSObject"));
+    }
+
+    /// <summary>
+    /// Intentionally invalid CodeProperty getter (must be public, static, non-void and take a
+    /// single PSObject parameter) used to reproduce the "getter method should be public, not
+    /// void, static..." error surfaced by real-world modules such as ActiveDirectory.
+    /// </summary>
+    public static class InvalidCodePropertyGetterProvider
+    {
+        public static void GetValue(object psObject)
+        {
+        }
+    }
 }
