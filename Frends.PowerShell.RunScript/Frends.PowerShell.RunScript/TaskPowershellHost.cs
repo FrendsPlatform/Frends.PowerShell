@@ -1,12 +1,12 @@
 ﻿using System.Globalization;
 using System.Management.Automation.Host;
 
-namespace Frends.PowerShell.RunScriptDEV;
+namespace Frends.PowerShell.RunScript;
 
 /// <summary>
-/// This is a sample implementation of the PSHost abstract class for 
-/// console applications. Not all members are implemented. Those that 
-/// are not implemented throw a NotImplementedException exception or 
+/// This is a sample implementation of the PSHost abstract class for
+/// console applications. Not all members are implemented. Those that
+/// are not implemented throw a NotImplementedException exception or
 /// return nothing.
 /// </summary>
 internal class TaskPowershellHost : PSHost
@@ -30,7 +30,7 @@ internal class TaskPowershellHost : PSHost
 
     /// <summary>
     /// Initializes a new instance of the MyHost class. Keep
-    /// a reference to the host application object so that it 
+    /// a reference to the host application object so that it
     /// can be informed of when to exit.
     /// </summary>
     public TaskPowershellHost()
@@ -38,8 +38,8 @@ internal class TaskPowershellHost : PSHost
     }
 
     /// <summary>
-    /// Return the culture information to use. This implementation 
-    /// returns a snapshot of the culture information of the thread 
+    /// Return the culture information to use. This implementation
+    /// returns a snapshot of the culture information of the thread
     /// that created this object.
     /// </summary>
     public override CultureInfo CurrentCulture
@@ -48,8 +48,8 @@ internal class TaskPowershellHost : PSHost
     }
 
     /// <summary>
-    /// Return the UI culture information to use. This implementation 
-    /// returns a snapshot of the UI culture information of the thread 
+    /// Return the UI culture information to use. This implementation
+    /// returns a snapshot of the UI culture information of the thread
     /// that created this object.
     /// </summary>
     public override CultureInfo CurrentUICulture
@@ -58,7 +58,7 @@ internal class TaskPowershellHost : PSHost
     }
 
     /// <summary>
-    /// This implementation always returns the GUID allocated at 
+    /// This implementation always returns the GUID allocated at
     /// instantiation time.
     /// </summary>
     public override Guid InstanceId
@@ -67,7 +67,7 @@ internal class TaskPowershellHost : PSHost
     }
 
     /// <summary>
-    /// Return a string that contains the name of the host implementation. 
+    /// Return a string that contains the name of the host implementation.
     /// Keep in mind that this string may be used by script writers to
     /// identify when your host is being used.
     /// </summary>
@@ -118,10 +118,10 @@ internal class TaskPowershellHost : PSHost
     }
 
     /// <summary>
-    /// This API is called before an external application process is 
-    /// started. Typically it is used to save state so the parent can 
-    /// restore state that has been modified by a child process (after 
-    /// the child exits). In this example, this functionality is not  
+    /// This API is called before an external application process is
+    /// started. Typically it is used to save state so the parent can
+    /// restore state that has been modified by a child process (after
+    /// the child exits). In this example, this functionality is not
     /// needed so the method returns nothing.
     /// </summary>
     public override void NotifyBeginApplication()
@@ -132,7 +132,7 @@ internal class TaskPowershellHost : PSHost
     /// <summary>
     /// This API is called after an external application process finishes.
     /// Typically it is used to restore state that a child process may
-    /// have altered. In this example, this functionality is not  
+    /// have altered. In this example, this functionality is not
     /// needed so the method returns nothing.
     /// </summary>
     public override void NotifyEndApplication()
