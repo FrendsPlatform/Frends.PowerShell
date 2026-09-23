@@ -7,7 +7,7 @@
 	<AssemblyName>Frends.PowerShell.RunScript</AssemblyName>
 	<RootNamespace>Frends.PowerShell.RunScript</RootNamespace>
 
-	<Version>1.0.0</Version>
+	<Version>1.3.0</Version>
 	<Authors>Frends</Authors>
 	<Copyright>Frends</Copyright>
 	<Company>Frends</Company>
@@ -15,6 +15,7 @@
 	<PackageTags>Frends</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<NoWarn>$(NoWarn);NU5110;NU5111</NoWarn>
 	<Description>Task for running scripts on PowerShell. Requires PowerShell 7.0 to work.</Description>
 	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.PowerShell/tree/main/Frends.PowerShell.RunScript</RepositoryUrl>
@@ -23,6 +24,10 @@
   <ItemGroup>
     <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Helpers\CustomPowerShellWrapper.ps1" Pack="true" PackagePath="/Helpers">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
 
@@ -34,4 +39,3 @@
   </ItemGroup>
 
 </Project>
-

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0] - 2026-09-23
+### Added
+- Option to execute scripts with a custom PowerShell executable. New option can't use shared session, but can have execution policy set
+### Changed
+- Updated PowerShell to 7.4.20
+- Update target framework to .NET 8.0
+
 ## [1.2.0] - 2024-10-09
 ### Changed
 - Added explicit reference to Microsoft.Management.Infrastructure
