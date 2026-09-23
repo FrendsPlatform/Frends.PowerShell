@@ -4,7 +4,7 @@ using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Security;
 
-namespace Frends.PowerShell.RunScript;
+namespace Frends.PowerShell.RunScriptDEV;
 
 internal class TaskUserInterface : PSHostUserInterface
 {

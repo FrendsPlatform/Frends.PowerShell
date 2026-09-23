@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Frends.PowerShell.RunScript.Definitions;
+using Frends.PowerShell.RunScriptDEV.Definitions;
 using NUnit.Framework;
 
 namespace Frends.PowerShell.RunScript.Tests;
@@ -26,7 +26,7 @@ public class UnitTests
                 Value = "CurrentUser"
             }
         };
-        PowerShell.RunCommand(command, parameters, new RunOptions(), default);
+        RunScriptDEV.PowerShell.RunCommand(command, parameters, new RunOptions(), default);
     }
 
     [Test]
@@ -36,7 +36,7 @@ public class UnitTests
 $testParam
 write-output ""my test param: $testParam""";
 
-        var result = PowerShell.RunScript(new RunScriptInput
+        var result = RunScriptDEV.PowerShell.RunScriptDEV(new RunScriptInput
         {
             Parameters = new[] { new PowerShellParameter { Name = "testParam", Value = "my test param" } },
             ReadFromFile = false,
@@ -61,7 +61,7 @@ new-timespan -hours 2";
         try
         {
             File.WriteAllText(scriptFilePath, script);
-            result = PowerShell.RunScript(new RunScriptInput
+            result = RunScriptDEV.PowerShell.RunScriptDEV(new RunScriptInput
             {
                 ReadFromFile = true,
                 ScriptFilePath = scriptFilePath,
@@ -82,7 +82,7 @@ new-timespan -hours 2";
     {
         PowerShellResult result;
 
-        result = PowerShell.RunScript(new RunScriptInput
+        result = RunScriptDEV.PowerShell.RunScriptDEV(new RunScriptInput
         {
             ReadFromFile = false,
             Script = script,
@@ -95,8 +95,8 @@ new-timespan -hours 2";
     [Test]
     public void RunCommandAndScript_ShouldUseSharedSession()
     {
-        var session = PowerShell.CreateSession();
-        _ = PowerShell.RunScript(new RunScriptInput
+        var session = RunScriptDEV.PowerShell.CreateSession();
+        _ = RunScriptDEV.PowerShell.RunScriptDEV(new RunScriptInput
         {
             ReadFromFile = false,
             Script = "$timespan = $timespan + (new-timespan -hours 1)",
@@ -107,7 +107,7 @@ new-timespan -hours 2";
                 Session = session
             }, default);
 
-        var result2 = PowerShell.RunScript(new RunScriptInput
+        var result2 = RunScriptDEV.PowerShell.RunScriptDEV(new RunScriptInput
         {
             ReadFromFile = false,
             Script = "(new-timespan -hours 1) + $timespan",
@@ -128,11 +128,11 @@ new-timespan -hours 2";
 @"
 This-DoesNotExist
 $Source = @""
-using System; 
+using System;
 namespace test {
     public static class pstest {
         public static void test`(`) {
-        throw new Exception(""Argh""); 
+        throw new Exception(""Argh"");
         }
     }
 }
@@ -143,7 +143,7 @@ Add-Type -TypeDefinition $Source -Language CSharp
 get-process -name doesnotexist -ErrorAction Stop
 ";
 
-        var resultError = Assert.Throws<Exception>(() => PowerShell.RunScript(new RunScriptInput { ReadFromFile = false, Script = script, LogInformationStream = true }, null, default));
+        var resultError = Assert.Throws<Exception>(() => RunScriptDEV.PowerShell.RunScriptDEV(new RunScriptInput { ReadFromFile = false, Script = script, LogInformationStream = true }, null, default));
 
         Assert.That(resultError.Message, Is.Not.Null);
     }
@@ -157,7 +157,7 @@ $test | Add-Member -type NoteProperty -name Property1 -Value 'Value1'
 $test | Add-Member -type NoteProperty -name Property2 -Value 'Value2'
 $test
 ";
-        var result = PowerShell.RunScript(new RunScriptInput
+        var result = RunScriptDEV.PowerShell.RunScriptDEV(new RunScriptInput
         {
             ReadFromFile = false,
             Script = script,
@@ -207,7 +207,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 $@"Update-TypeData -AppendPath '{typesFilePath}'
 ""hello"".InvalidGetter";
 
-            result = PowerShell.RunScript(new RunScriptInput
+            result = RunScriptDEV.PowerShell.RunScriptDEV(new RunScriptInput
             {
                 ReadFromFile = false,
                 Script = script,

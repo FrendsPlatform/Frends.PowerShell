@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Security;
+using Frends.PowerShell.RunScriptDEV;
 using NUnit.Framework;
 
 namespace Frends.PowerShell.RunScript.Tests;

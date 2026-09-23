@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frends.PowerShell.RunScript.Definitions;
+namespace Frends.PowerShell.RunScriptDEV.Definitions;
 
 /// <summary>
 /// Input parameters.

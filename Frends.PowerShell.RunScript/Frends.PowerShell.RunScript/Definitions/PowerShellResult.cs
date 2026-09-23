@@ -1,4 +1,4 @@
-﻿namespace Frends.PowerShell.RunScript;
+﻿namespace Frends.PowerShell.RunScriptDEV.Definitions;
 
 /// <summary>
 /// Result.

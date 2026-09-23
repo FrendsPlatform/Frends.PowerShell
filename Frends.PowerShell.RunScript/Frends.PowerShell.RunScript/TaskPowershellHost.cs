@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Management.Automation.Host;
 
-namespace Frends.PowerShell.RunScript;
+namespace Frends.PowerShell.RunScriptDEV;
 
 /// <summary>
 /// This is a sample implementation of the PSHost abstract class for 

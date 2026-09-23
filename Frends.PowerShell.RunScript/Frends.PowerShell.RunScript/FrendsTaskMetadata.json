@@ -1,7 +1,7 @@
 ﻿{
 	"Tasks": [
 		{
-			"TaskMethod": "Frends.PowerShell.RunScript.PowerShell.RunScript"
+			"TaskMethod": "Frends.PowerShell.RunScriptDEV.PowerShell.RunScriptDEV"
 		}
 	]
 }

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Management.Automation.Runspaces;
 
-namespace Frends.PowerShell.RunScript;
+namespace Frends.PowerShell.RunScriptDEV;
 
 /// <summary>
 /// Wraps the powershell session
