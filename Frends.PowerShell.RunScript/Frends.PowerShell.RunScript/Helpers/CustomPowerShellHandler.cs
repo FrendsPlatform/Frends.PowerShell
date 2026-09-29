@@ -8,9 +8,6 @@ namespace Frends.PowerShell.RunScript.Helpers;
 
 internal static class CustomPowerShellHandler
 {
-    // Reads the script/command and its parameters from standard input (as a Base64 encoded CLIXML envelope)
-    // and writes the result payload to standard output after a unique boundary marker, so that no data ever
-    // has to be written to disk.
     private const string WrapperScript = """
         $envelopeXml = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String([Console]::In.ReadToEnd()))
         $envelope = [System.Management.Automation.PSSerializer]::Deserialize($envelopeXml)
