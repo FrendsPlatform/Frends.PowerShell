@@ -12,26 +12,6 @@ namespace Frends.PowerShell.RunScript.Tests;
 [TestFixture]
 public class UnitTests
 {
-    [OneTimeSetUp]
-    public void Setup()
-    {
-        var command = "Set-ExecutionPolicy";
-        PowerShellParameter[] parameters = new PowerShellParameter[]
-        {
-            new PowerShellParameter
-            {
-                Name = "ExecutionPolicy",
-                Value = "Unrestricted"
-            },
-            new PowerShellParameter
-            {
-                Name = "Scope",
-                Value = "CurrentUser"
-            }
-        };
-        PowerShell.RunCommand(command, parameters, new RunOptions(), default);
-    }
-
     [Test]
     public void RunScript_ShouldRunScriptWithParameter()
     {
@@ -121,6 +101,9 @@ new-timespan -hours 2";
     [Test]
     public void RunScript_ShouldUseSelectedExecutionPolicy()
     {
+        if (!OperatingSystem.IsWindows())
+            Assert.Ignore("PowerShell execution policies are only supported on Windows.");
+
         var result = PowerShell.RunScript(new RunScriptInput
         {
             ReadFromFile = false,

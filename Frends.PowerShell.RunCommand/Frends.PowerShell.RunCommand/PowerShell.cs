@@ -1,5 +1,4 @@
 ﻿using Frends.PowerShell.RunCommand.Definitions;
-using System.ComponentModel;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Reflection;
@@ -8,6 +7,7 @@ using System.Runtime.Loader;
 using Frends.PowerShell.RunCommand.Helpers;
 
 [assembly: InternalsVisibleTo("Frends.PowerShell.RunCommand.Tests")]
+
 namespace Frends.PowerShell.RunCommand;
 
 /// <summary>
@@ -73,27 +73,32 @@ public static class PowerShell
         return errors.Select(err => $"{err.ScriptStackTrace}: {err.Exception.Message}").ToList();
     }
 
-    private static PowerShellResult ExecutePowershell(System.Management.Automation.PowerShell powershell, bool logInformationStream)
+    private static PowerShellResult ExecutePowershell(System.Management.Automation.PowerShell powershell,
+        bool logInformationStream)
     {
         try
         {
             var execution = powershell.Invoke();
-            var result = new PowerShellResult (
+            var result = new PowerShellResult(
                 // Powershell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
                 execution?.Select(PowerShellHandler.GetResultObject).ToList(),
                 GetErrorMessages(powershell.Streams.Error),
-                logInformationStream == false ? "" : string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
+                logInformationStream == false
+                    ? ""
+                    : string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
             );
 
             return result;
         }
         catch (Exception e)
         {
-            throw new Exception($"Encountered terminating error while executing powershell: \n{e}\nErrors:\n{string.Join("\n", GetErrorMessages(powershell.Streams.Error))}");
+            throw new Exception(
+                $"Encountered terminating error while executing powershell: \n{e}\nErrors:\n{string.Join("\n", GetErrorMessages(powershell.Streams.Error))}");
         }
         finally
         {
-            powershell.Commands.Clear(); // Clear the executed commands from the session so they do not get executed again
+            powershell.Commands
+                .Clear(); // Clear the executed commands from the session so they do not get executed again
             powershell.Streams.ClearStreams();
         }
     }
@@ -103,7 +108,8 @@ public static class PowerShell
         return new SessionWrapper();
     }
 
-    private static PowerShellResult DoAndHandleSession(SessionWrapper sessionFromOutside, Func<SessionWrapper, PowerShellResult> action)
+    private static PowerShellResult DoAndHandleSession(SessionWrapper sessionFromOutside,
+        Func<SessionWrapper, PowerShellResult> action)
     {
         SessionWrapper internalSession = null;
         // use the external session if provided or create and dispose an internal session
@@ -118,6 +124,7 @@ public static class PowerShell
             internalSession?.Dispose();
         }
     }
+
     private static void OnPluginUnloadingRequested(AssemblyLoadContext obj)
     {
         obj.Unloading -= OnPluginUnloadingRequested;
