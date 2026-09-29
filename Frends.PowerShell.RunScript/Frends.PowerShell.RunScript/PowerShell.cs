@@ -56,15 +56,12 @@ public static class PowerShell
         bool logInformationStream, bool isScript, System.Management.Automation.PowerShell powershell,
         CancellationToken cancellationToken)
     {
-        // isScript: true executes inputCommand as script text held entirely in memory, avoiding any temp files.
         var command = new Command(inputCommand, isScript: isScript, useLocalScope: false);
 
-        foreach (var parameter in powerShellParameters ?? Array.Empty<PowerShellParameter>())
+        foreach (var parameter in powerShellParameters ?? [])
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var parameterName = parameter.Name.Trim('-', ' '); // Remove dash from start
-
-            // Switch parameters will have to specify value as true:
+            var parameterName = parameter.Name.Trim('-', ' ');
             command.Parameters.Add(new CommandParameter(parameterName, parameter.Value));
         }
 
@@ -104,7 +101,7 @@ public static class PowerShell
             var execution = powershell.Invoke();
             var result = new PowerShellResult
             (
-                // Powershell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
+                // PowerShell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
                 execution?.Select(PowerShellHandler.GetResultObject).ToList(),
                 GetErrorMessages(powershell.Streams.Error),
                 logInformationStream == false

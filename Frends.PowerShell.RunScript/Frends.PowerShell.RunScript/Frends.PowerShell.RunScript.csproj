@@ -15,8 +15,7 @@
 	<PackageTags>Frends</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<NoWarn>$(NoWarn);NU5110;NU5111</NoWarn>
-	<Description>Task for running scripts on PowerShell. Requires PowerShell 7.0 to work.</Description>
+	<Description>Task for running scripts on PowerShell.</Description>
 	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.PowerShell/tree/main/Frends.PowerShell.RunScript</RepositoryUrl>
   </PropertyGroup>
