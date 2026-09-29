@@ -25,10 +25,6 @@
     <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Helpers\CustomPowerShellWrapper.ps1" Pack="true" PackagePath="/Helpers">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

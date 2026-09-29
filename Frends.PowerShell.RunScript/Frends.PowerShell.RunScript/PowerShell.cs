@@ -4,7 +4,6 @@ using System.Management.Automation.Runspaces;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
-using System.Text;
 using Frends.PowerShell.RunScript.Definitions;
 using Frends.PowerShell.RunScript.Helpers;
 
@@ -37,41 +36,15 @@ public static class PowerShell
     public static PowerShellResult RunScript(RunScriptInput input, RunOptions options,
         CancellationToken cancellationToken)
     {
+        var script = input.ReadFromFile ? File.ReadAllText(input.ScriptFilePath) : input.Script;
+
         if (UsesCustomPowerShell(options))
-        {
-            var script = input.ReadFromFile ? File.ReadAllText(input.ScriptFilePath) : input.Script;
-            var tempScript = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.ps1");
-
-            try
-            {
-                File.WriteAllText(tempScript, script, Encoding.UTF8);
-
-                return CustomPowerShellHandler.ExecuteCustomPowerShell(tempScript, input.Parameters,
-                    input.LogInformationStream, options, cancellationToken);
-            }
-            finally
-            {
-                File.Delete(tempScript);
-            }
-        }
+            return CustomPowerShellHandler.ExecuteCustomPowerShell(script, input.Parameters,
+                input.LogInformationStream, isScript: true, options, cancellationToken);
 
         return DoAndHandleSession(options?.Session, session =>
-        {
-            var script = input.ReadFromFile ? File.ReadAllText(input.ScriptFilePath) : input.Script;
-            var tempScript = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.ps1");
-
-            try
-            {
-                File.WriteAllText(tempScript, script, Encoding.UTF8);
-
-                return ExecuteCommand(tempScript, input.Parameters, input.LogInformationStream, session.PowerShell,
-                    cancellationToken);
-            }
-            finally
-            {
-                File.Delete(tempScript);
-            }
-        });
+            ExecuteCommand(script, input.Parameters, input.LogInformationStream, isScript: true, session.PowerShell,
+                cancellationToken));
     }
 
     private static bool UsesCustomPowerShell(RunOptions options)
@@ -80,10 +53,11 @@ public static class PowerShell
     }
 
     private static PowerShellResult ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters,
-        bool logInformationStream, System.Management.Automation.PowerShell powershell,
+        bool logInformationStream, bool isScript, System.Management.Automation.PowerShell powershell,
         CancellationToken cancellationToken)
     {
-        var command = new Command(inputCommand, isScript: false, useLocalScope: false);
+        // isScript: true executes inputCommand as script text held entirely in memory, avoiding any temp files.
+        var command = new Command(inputCommand, isScript: isScript, useLocalScope: false);
 
         foreach (var parameter in powerShellParameters ?? Array.Empty<PowerShellParameter>())
         {
@@ -166,12 +140,13 @@ public static class PowerShell
         [Browsable(false)] RunOptions options, CancellationToken cancellationToken)
     {
         if (UsesCustomPowerShell(options))
-            return CustomPowerShellHandler.ExecuteCustomPowerShell(command, parameters, false, options,
-                cancellationToken);
+            return CustomPowerShellHandler.ExecuteCustomPowerShell(command, parameters, false, isScript: false,
+                options, cancellationToken);
 
         return DoAndHandleSession(options?.Session, (session) =>
         {
-            return ExecuteCommand(command, parameters, false, session.PowerShell, cancellationToken: cancellationToken);
+            return ExecuteCommand(command, parameters, false, isScript: false, session.PowerShell,
+                cancellationToken: cancellationToken);
         });
     }
 
