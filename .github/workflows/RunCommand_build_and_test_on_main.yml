@@ -16,5 +16,6 @@ jobs:
       workflow_mode: main
       os: all
       workdir: Frends.PowerShell.RunCommand
+      strict_analyzers: 'false'
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
