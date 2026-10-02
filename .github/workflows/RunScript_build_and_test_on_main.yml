@@ -17,5 +17,6 @@ jobs:
       os: all
       workdir: Frends.PowerShell.RunScript
       strict_analyzers: false
+      pretest_command: if ($IsWindows) { Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope LocalMachine -Force }
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
