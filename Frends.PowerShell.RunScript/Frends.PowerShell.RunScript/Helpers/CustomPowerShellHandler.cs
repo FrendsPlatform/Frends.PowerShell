@@ -29,22 +29,21 @@ internal static class CustomPowerShellHandler
                 $allOutput = @(& $target @parameters *>&1)
             }
 
-            $results = @($allOutput | Where-Object {
-                if ($_ -is [System.Management.Automation.ErrorRecord]) {
-                    $errors += $_
-                    return $false
+            $results = @()
+            foreach ($item in $allOutput) {
+                if ($item -is [System.Management.Automation.ErrorRecord]) {
+                    $errors += $item
                 }
-
-                if ($_ -is [System.Management.Automation.InformationRecord]) {
-                    $information += $_
-                    return $false
+                elseif ($item -is [System.Management.Automation.InformationRecord]) {
+                    $information += $item
                 }
-
-                return $_ -isnot [System.Management.Automation.WarningRecord] -and
-                    $_ -isnot [System.Management.Automation.VerboseRecord] -and
-                    $_ -isnot [System.Management.Automation.DebugRecord] -and
-                    $_ -isnot [System.Management.Automation.ProgressRecord]
-            })
+                elseif ($item -isnot [System.Management.Automation.WarningRecord] -and
+                    $item -isnot [System.Management.Automation.VerboseRecord] -and
+                    $item -isnot [System.Management.Automation.DebugRecord] -and
+                    $item -isnot [System.Management.Automation.ProgressRecord]) {
+                    $results += $item
+                }
+            }
         }
         catch {
             $errors += $_
@@ -63,7 +62,7 @@ internal static class CustomPowerShellHandler
         $payloadXml = [System.Management.Automation.PSSerializer]::Serialize($payload, 100)
         $payloadBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($payloadXml))
 
-        [Console]::Out.Write("$env:FRENDS_RESULT_BOUNDARY$payloadBase64")
+        [Console]::Out.Write("$env:FRENDS_RESULT_BOUNDARY$payloadBase64$env:FRENDS_RESULT_END")
         [Console]::Out.Flush()
 
         if ($terminatingError) {
@@ -109,6 +108,7 @@ internal static class CustomPowerShellHandler
             Encoding.UTF8.GetBytes(PSSerializer.Serialize(envelope, 100)));
 
         var resultBoundary = $"##FRENDS_RESULT_{Guid.NewGuid():N}##";
+        var resultEndMarker = $"##FRENDS_END_{Guid.NewGuid():N}##";
 
         var startInfo = new ProcessStartInfo(options.PathToCustomPowerShell)
         {
@@ -119,6 +119,7 @@ internal static class CustomPowerShellHandler
             RedirectStandardError = true
         };
         startInfo.Environment["FRENDS_RESULT_BOUNDARY"] = resultBoundary;
+        startInfo.Environment["FRENDS_RESULT_END"] = resultEndMarker;
         startInfo.ArgumentList.Add("-NoLogo");
         startInfo.ArgumentList.Add("-NoProfile");
         startInfo.ArgumentList.Add("-NonInteractive");
@@ -162,7 +163,13 @@ internal static class CustomPowerShellHandler
             throw new Exception($"Encountered terminating error while executing powershell: \n{errorDetails}");
         }
 
-        var payload = DeserializePayload(output[(boundaryIndex + resultBoundary.Length)..]);
+        var payloadStartIndex = boundaryIndex + resultBoundary.Length;
+        var payloadEndIndex = output.IndexOf(resultEndMarker, payloadStartIndex, StringComparison.Ordinal);
+
+        if (payloadEndIndex < 0)
+            throw new Exception("The custom PowerShell process returned an incomplete result payload.");
+
+        var payload = DeserializePayload(output[payloadStartIndex..payloadEndIndex]);
 
         var errors = ToObjectList(payload["Errors"]).Select(item => item?.ToString())
             .Where(item => item != null).ToList();
