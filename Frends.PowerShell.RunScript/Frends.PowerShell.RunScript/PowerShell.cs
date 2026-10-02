@@ -36,14 +36,15 @@ public static class PowerShell
     public static PowerShellResult RunScript(RunScriptInput input, RunOptions options,
         CancellationToken cancellationToken)
     {
-        var script = input.ReadFromFile ? File.ReadAllText(input.ScriptFilePath) : input.Script;
+        var script = input.ReadFromFile ? input.ScriptFilePath : input.Script;
+        var isScript = !input.ReadFromFile;
 
         if (UsesCustomPowerShell(options))
             return CustomPowerShellHandler.ExecuteCustomPowerShell(script, input.Parameters,
-                input.LogInformationStream, isScript: true, options, cancellationToken);
+                input.LogInformationStream, isScript, options, cancellationToken);
 
         return DoAndHandleSession(options?.Session, session =>
-            ExecuteCommand(script, input.Parameters, input.LogInformationStream, isScript: true, session.PowerShell,
+            ExecuteCommand(script, input.Parameters, input.LogInformationStream, isScript, session.PowerShell,
                 cancellationToken));
     }
 

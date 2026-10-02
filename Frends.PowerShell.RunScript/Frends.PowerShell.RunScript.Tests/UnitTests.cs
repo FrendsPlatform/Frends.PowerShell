@@ -40,7 +40,7 @@ new-timespan -hours 2";
     [Test]
     public void RunScript_ShouldRunScriptFromFile()
     {
-        var scriptFilePath = Path.GetTempFileName();
+        var scriptFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.ps1");
         PowerShellResult result;
         try
         {
@@ -59,6 +59,36 @@ new-timespan -hours 2";
 
         Assert.That(result.Result.Count, Is.EqualTo(2));
         Assert.That(result.Result.Last(), Is.EqualTo(TimeSpan.FromHours(2)));
+    }
+
+    [Test]
+    public void RunScript_ShouldPreserveScriptFileContext()
+    {
+        var scriptDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(scriptDirectory);
+        var scriptFilePath = Path.Combine(scriptDirectory, "main.ps1");
+        var helperFilePath = Path.Combine(scriptDirectory, "helper.ps1");
+
+        try
+        {
+            File.WriteAllText(helperFilePath, "'dot-sourced'");
+            File.WriteAllText(scriptFilePath,
+                ". \"$PSScriptRoot/helper.ps1\"\n[PSCustomObject]@{ ScriptPath = $PSCommandPath; ScriptRoot = $PSScriptRoot }");
+
+            var result = PowerShell.RunScript(new RunScriptInput
+            {
+                ReadFromFile = true,
+                ScriptFilePath = scriptFilePath,
+            }, new RunOptions(), default);
+
+            Assert.That(result.Result[0], Is.EqualTo("dot-sourced"));
+            Assert.That(result.Result[1].ScriptPath, Is.EqualTo(scriptFilePath));
+            Assert.That(result.Result[1].ScriptRoot, Is.EqualTo(scriptDirectory));
+        }
+        finally
+        {
+            Directory.Delete(scriptDirectory, recursive: true);
+        }
     }
 
     [Test]

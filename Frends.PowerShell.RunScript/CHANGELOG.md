@@ -6,6 +6,7 @@
 ### Changed
 - Updated PowerShell to 7.4.20
 - Update target framework to .NET 8.0
+- `ReadFromFile = true` now executes the script file directly, preserving `$PSCommandPath`, `$PSScriptRoot`, and relative dot-sourcing; inline scripts continue to run as script text.
 
 ## [1.2.0] - 2024-10-09
 ### Changed
