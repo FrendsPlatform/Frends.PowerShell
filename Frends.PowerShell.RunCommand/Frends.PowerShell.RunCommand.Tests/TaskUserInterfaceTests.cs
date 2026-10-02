@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Management.Automation;
 using System.Management.Automation.Host;
-using System.Security;
 using Frends.PowerShell.RunCommand;
 using NUnit.Framework;
 
@@ -29,13 +28,15 @@ public class TaskUserInterfaceTests
         taskUserInterface.ReadLineAsSecureString();
 
         Assert.AreEqual("", taskUserInterface.ReadLine());
-        Assert.AreEqual(1, taskUserInterface.PromptForChoice("Caption", "Message", new Collection<ChoiceDescription>(), 1));
+        Assert.AreEqual(1,
+            taskUserInterface.PromptForChoice("Caption", "Message", new Collection<ChoiceDescription>(), 1));
 
-        var answer = taskUserInterface.Prompt("Caption", "Message", new Collection<FieldDescription> { new ("Name") });
+        var answer = taskUserInterface.Prompt("Caption", "Message", new Collection<FieldDescription> { new("Name") });
         Assert.AreEqual(1, answer.Count);
 
-        Assert.Throws<NotImplementedException>(() => taskUserInterface.PromptForCredential("Caption", "Message", "UserName", "TargetName"));
-        Assert.Throws<NotImplementedException>(() => taskUserInterface.PromptForCredential("Caption", "Message", "UserName", "TargetName", PSCredentialTypes.Domain, PSCredentialUIOptions.Default));
-
+        Assert.Throws<NotImplementedException>(() =>
+            taskUserInterface.PromptForCredential("Caption", "Message", "UserName", "TargetName"));
+        Assert.Throws<NotImplementedException>(() => taskUserInterface.PromptForCredential("Caption", "Message",
+            "UserName", "TargetName", PSCredentialTypes.Domain, PSCredentialUIOptions.Default));
     }
 }

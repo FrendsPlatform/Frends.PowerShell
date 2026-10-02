@@ -6,17 +6,18 @@ on:
       - main
     paths:
       - 'Frends.PowerShell.RunScript/**'
+      - '.github/workflows/RunScript*.yml'
   workflow_dispatch:
-    paths:
-      - 'Frends.PowerShell.RunScript/**'
-  
 
 jobs:
-  build:
-    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_test.yml@main
+  work_push:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/official_task_pipeline.yml@main
     with:
+      workflow_mode: work
+      os: all
       workdir: Frends.PowerShell.RunScript
+      strict_analyzers: false
+      pretest_command: if ($IsWindows) { Add-Content -Path $env:GITHUB_ENV -Value 'PSExecutionPolicyPreference=Unrestricted' }
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
-      test_feed_api_key: ${{ secrets.TASKS_TEST_FEED_API_KEY }}
-      
+      target_feed_api_key: ${{ secrets.TASKS_TEST_FEED_API_KEY }}

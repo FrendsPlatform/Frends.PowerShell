@@ -9,10 +9,35 @@ namespace Frends.PowerShell.RunScript.Definitions;
 public class RunOptions
 {
     /// <summary>
+    /// PowerShell executable to use.
+    /// </summary>
+    /// <example>Default</example>
+    [DefaultValue(PowerShellType.Default)]
+    public PowerShellType PowerShellType { get; set; } = PowerShellType.Default;
+
+    /// <summary>
+    /// Path to the custom PowerShell executable.
+    /// </summary>
+    /// <example>C:\Program Files\PowerShell\7\pwsh.exe</example>
+    [UIHint(nameof(PowerShellType), "", PowerShellType.Custom)]
+    [DisplayFormat(DataFormatString = "Text")]
+    public string PathToCustomPowerShell { get; set; }
+
+    /// <summary>
+    /// Execution policy for the custom PowerShell process.
+    /// SystemDefault leaves policy resolution to the selected PowerShell executable and its environment.
+    /// </summary>
+    /// <example>SystemDefault</example>
+    [DefaultValue(PowerShellExecutionPolicy.SystemDefault)]
+    [UIHint(nameof(PowerShellType), "", PowerShellType.Custom)]
+    public PowerShellExecutionPolicy ExecutionPolicy { get; set; } = PowerShellExecutionPolicy.SystemDefault;
+
+    /// <summary>
     /// Session parameter.
     /// </summary>
     /// <example>null</example>
     [DefaultValue(null)]
     [DisplayFormat(DataFormatString = "Expression")]
+    [UIHint(nameof(PowerShellType), "", PowerShellType.Default)]
     public SessionWrapper Session { get; set; }
 }
