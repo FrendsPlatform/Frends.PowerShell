@@ -5,7 +5,7 @@ namespace Frends.PowerShell.RunCommand.Definitions;
 /// <summary>
 /// Input parameters.
 /// </summary>
-public class RunCommandInput
+public class Input
 {
     /// <summary>
     /// The PowerShell command to execute 

@@ -14,7 +14,7 @@ public class UnitTests
     [Test]
     public void RunCommand_ShouldRunCommandWithParameter()
     {
-        var result = PowerShell.RunCommand(new RunCommandInput
+        var result = PowerShell.RunCommand(new Input
         {
             Command = "New-TimeSpan",
             Parameters = new[]
@@ -27,10 +27,10 @@ public class UnitTests
             },
             LogInformationStream = true
         },
-            new RunOptions(), CancellationToken.None);
+            new Options(), CancellationToken.None);
 
-        Assert.That(result.Result, Is.Not.Null);
-        Assert.That(result.Result.Single(), Is.EqualTo(TimeSpan.FromHours(1)));
+        Assert.That(result.Results, Is.Not.Null);
+        Assert.That(result.Results.Single(), Is.EqualTo(TimeSpan.FromHours(1)));
     }
 
     [TestCase(true)]
@@ -46,7 +46,7 @@ function Test-Switch {
         session.PowerShell.Invoke();
         session.PowerShell.Commands.Clear();
 
-        var result = PowerShell.RunCommand(new RunCommandInput
+        var result = PowerShell.RunCommand(new Input
         {
             Command = "Test-Switch",
             Parameters = new[]
@@ -59,30 +59,30 @@ function Test-Switch {
                 },
             LogInformationStream = true
         },
-            new RunOptions
+            new Options
             {
                 Session = session
             }, CancellationToken.None);
 
-        Assert.That(result.Result.Single(), Is.EqualTo(switchParameterValue));
+        Assert.That(result.Results.Single(), Is.EqualTo(switchParameterValue));
     }
 
     [Test]
     public void RunCommand_ShouldUseCustomPowerShell()
     {
-        var result = PowerShell.RunCommand(new RunCommandInput
+        var result = PowerShell.RunCommand(new Input
         {
             Command = "Write-Output",
             Parameters = [new PowerShellParameter { Name = "InputObject", Value = "custom powershell" }],
             LogInformationStream = true,
-        }, new RunOptions
+        }, new Options
         {
             PowerShellType = PowerShellType.Custom,
             PathToCustomPowerShell = FindPowerShellExecutable(),
             ExecutionPolicy = PowerShellExecutionPolicy.Bypass,
         }, CancellationToken.None);
 
-        Assert.That(result.Result.Single(), Is.EqualTo("custom powershell"));
+        Assert.That(result.Results.Single(), Is.EqualTo("custom powershell"));
     }
 
     [Test]
@@ -110,10 +110,10 @@ function Test-Switch {
     {
         using var session = PowerShell.CreateSession();
 
-        var exception = Assert.Throws<InvalidOperationException>(() => PowerShell.RunCommand(new RunCommandInput
+        var exception = Assert.Throws<InvalidOperationException>(() => PowerShell.RunCommand(new Input
         {
             Command = "Write-Output",
-        }, new RunOptions
+        }, new Options
         {
             PowerShellType = PowerShellType.Custom,
             PathToCustomPowerShell = FindPowerShellExecutable(),

@@ -41,6 +41,7 @@ internal class TaskPowershellHost : PSHost
     /// returns a snapshot of the culture information of the thread 
     /// that created this object.
     /// </summary>
+    /// <example>en-US</example>
     public override CultureInfo CurrentCulture
     {
         get { return _originalCultureInfo; }
@@ -51,6 +52,7 @@ internal class TaskPowershellHost : PSHost
     /// returns a snapshot of the UI culture information of the thread 
     /// that created this object.
     /// </summary>
+    /// <example>en-US</example>
     public override CultureInfo CurrentUICulture
     {
         get { return _originalUiCultureInfo; }
@@ -60,6 +62,7 @@ internal class TaskPowershellHost : PSHost
     /// This implementation always returns the GUID allocated at 
     /// instantiation time.
     /// </summary>
+    /// <example>3f2504e0-4f89-11d3-9a0c-0305e82c3301</example>
     public override Guid InstanceId
     {
         get { return _myId; }
@@ -70,6 +73,7 @@ internal class TaskPowershellHost : PSHost
     /// Keep in mind that this string may be used by script writers to
     /// identify when your host is being used.
     /// </summary>
+    /// <example>SimpleTaskPowershellHost</example>
     public override string Name
     {
         get { return "SimpleTaskPowershellHost"; }
@@ -80,6 +84,7 @@ internal class TaskPowershellHost : PSHost
     /// This sample does not implement a PSHostUserInterface component so
     /// this property simply returns null.
     /// </summary>
+    /// <example>TaskUserInterface</example>
     public override PSHostUserInterface UI
     {
         get { return _userInterface; }
@@ -89,11 +94,16 @@ internal class TaskPowershellHost : PSHost
     /// Return the version object for this application. Typically this
     /// should match the version resource in the application.
     /// </summary>
+    /// <example>1.0.0.0</example>
     public override Version Version
     {
         get { return new Version(1, 0, 0, 0); }
     }
 
+    /// <summary>
+    /// Ignores the exit request because the host is not interactive.
+    /// </summary>
+    /// <param name="exitCode">The exit code requested by the script.</param>
     public override void SetShouldExit(int exitCode)
     {
     }
@@ -102,6 +112,7 @@ internal class TaskPowershellHost : PSHost
     /// Not implemented by this example class. The call fails with
     /// a NotImplementedException exception.
     /// </summary>
+    /// <example>Not supported</example>
     public override void EnterNestedPrompt()
     {
         throw new NotImplementedException("The method or operation is not implemented.");
@@ -111,6 +122,7 @@ internal class TaskPowershellHost : PSHost
     /// Not implemented by this example class. The call fails
     /// with a NotImplementedException exception.
     /// </summary>
+    /// <example>Not supported</example>
     public override void ExitNestedPrompt()
     {
         throw new NotImplementedException("The method or operation is not implemented.");
@@ -123,6 +135,7 @@ internal class TaskPowershellHost : PSHost
     /// the child exits). In this example, this functionality is not  
     /// needed so the method returns nothing.
     /// </summary>
+    /// <example>No action</example>
     public override void NotifyBeginApplication()
     {
         return;
@@ -134,6 +147,7 @@ internal class TaskPowershellHost : PSHost
     /// have altered. In this example, this functionality is not  
     /// needed so the method returns nothing.
     /// </summary>
+    /// <example>No action</example>
     public override void NotifyEndApplication()
     {
         return;

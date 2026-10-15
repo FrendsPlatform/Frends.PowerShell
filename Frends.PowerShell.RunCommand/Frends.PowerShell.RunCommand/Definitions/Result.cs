@@ -3,13 +3,19 @@
 /// <summary>
 /// Task result.
 /// </summary>
-public class PowerShellResult
+public class Result
 {
+    /// <summary>
+    /// Indicates whether the operation completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; private set; }
+
     /// <summary>
     /// Result values.
     /// </summary>
     /// <example>{ foo, bar }</example>
-    public IList<dynamic> Result { get; private set; }
+    public IList<dynamic> Results { get; private set; }
 
     /// <summary>
     /// Errors.
@@ -23,10 +29,18 @@ public class PowerShellResult
     /// <example>foobar.</example>
     public string Log { get; private set; }
 
-    internal PowerShellResult(IList<dynamic> result, IList<string> errors, string log)
+    /// <summary>
+    /// Error details. Null when Success is true.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; private set; }
+
+    internal Result(bool success, IList<dynamic> results, IList<string> errors, string log, Error error = null)
     {
-        Result = result;
+        Success = success;
+        Results = results;
         Errors = errors;
         Log = log;
+        Error = error;
     }
 }
