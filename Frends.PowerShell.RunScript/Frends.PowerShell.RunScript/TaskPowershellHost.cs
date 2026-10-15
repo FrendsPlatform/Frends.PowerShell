@@ -42,6 +42,7 @@ internal class TaskPowershellHost : PSHost
     /// returns a snapshot of the culture information of the thread
     /// that created this object.
     /// </summary>
+    /// <example>en-US</example>
     public override CultureInfo CurrentCulture
     {
         get { return _originalCultureInfo; }
@@ -52,6 +53,7 @@ internal class TaskPowershellHost : PSHost
     /// returns a snapshot of the UI culture information of the thread
     /// that created this object.
     /// </summary>
+    /// <example>en-US</example>
     public override CultureInfo CurrentUICulture
     {
         get { return _originalUiCultureInfo; }
@@ -61,6 +63,7 @@ internal class TaskPowershellHost : PSHost
     /// This implementation always returns the GUID allocated at
     /// instantiation time.
     /// </summary>
+    /// <example>3f2504e0-4f89-11d3-9a0c-0305e82c3301</example>
     public override Guid InstanceId
     {
         get { return _myId; }
@@ -71,6 +74,7 @@ internal class TaskPowershellHost : PSHost
     /// Keep in mind that this string may be used by script writers to
     /// identify when your host is being used.
     /// </summary>
+    /// <example>SimpleTaskPowershellHost</example>
     public override string Name
     {
         get { return "SimpleTaskPowershellHost"; }
@@ -80,6 +84,7 @@ internal class TaskPowershellHost : PSHost
     /// This sample does not implement a PSHostUserInterface component so
     /// this property simply returns null.
     /// </summary>
+    /// <example>TaskUserInterface</example>
     public override PSHostUserInterface UI
     {
         get { return _userInterface; }
@@ -89,11 +94,16 @@ internal class TaskPowershellHost : PSHost
     /// Return the version object for this application. Typically this
     /// should match the version resource in the application.
     /// </summary>
+    /// <example>1.0.0.0</example>
     public override Version Version
     {
         get { return new Version(1, 0, 0, 0); }
     }
 
+    /// <summary>
+    /// Not implemented; exit requests are ignored.
+    /// </summary>
+    /// <param name="exitCode">Requested exit code.</param>
     public override void SetShouldExit(int exitCode)
     {
 

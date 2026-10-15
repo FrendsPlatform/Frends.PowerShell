@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Diagnostics;
 using System.Management.Automation;
 using System.Text;
@@ -70,12 +70,15 @@ internal static class CustomPowerShellHandler
         }
         """;
 
-    public static PowerShellResult ExecuteCustomPowerShell(
+    /// <summary>
+    /// Executes the target with a custom PowerShell executable.
+    /// </summary>
+    public static Result ExecuteCustomPowerShell(
         string target,
         PowerShellParameter[] powerShellParameters,
         bool logInformationStream,
         bool isScript,
-        RunOptions options,
+        Options options,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -190,7 +193,7 @@ internal static class CustomPowerShellHandler
             .ToList();
         var information = logInformationStream ? ToObjectList(payload["Information"]) : [];
 
-        return new PowerShellResult(results, errors, string.Join("\n", information));
+        return new Result(true, results, errors, string.Join("\n", information));
     }
 
     internal static void AddExecutionPolicyArguments(

@@ -6,7 +6,7 @@ namespace Frends.PowerShell.RunScript.Definitions;
 /// <summary>
 /// Input parameters.
 /// </summary>
-public class RunScriptInput
+public class Input
 {
     /// <summary>
     /// Parameters for the script, provided switch parameters need to have a boolean value
