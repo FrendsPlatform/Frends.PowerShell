@@ -238,7 +238,7 @@ Add-Type -TypeDefinition $Source -Language CSharp
 get-process -name doesnotexist -ErrorAction Stop
 ";
 
-        var resultError = Assert.Throws<Exception>(() => PowerShell.RunScript(new Input { ReadFromFile = false, Script = script, LogInformationStream = true }, new Options{ThrowErrorOnFailure = false}, default));
+        var resultError = Assert.Throws<Exception>(() => PowerShell.RunScript(new Input { ReadFromFile = false, Script = script, LogInformationStream = true }, new Options(), default));
 
         Assert.That(resultError.Message, Is.Not.Null);
     }
