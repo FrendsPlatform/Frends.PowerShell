@@ -15,5 +15,5 @@ public class Error
     /// Additional information about the error.
     /// </summary>
     /// <example>System.Exception: Encountered terminating error while executing powershell</example>
-    public dynamic AdditionalInfo { get; set; }
+    public Exception AdditionalInfo { get; set; }
 }

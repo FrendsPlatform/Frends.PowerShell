@@ -38,8 +38,6 @@ public static class PowerShell
         [PropertyTab] Options options,
         CancellationToken cancellationToken)
     {
-        options ??= new Options();
-
         try
         {
             ValidationHandler.Run(input, options);
@@ -48,11 +46,23 @@ public static class PowerShell
             var isScript = !input.ReadFromFile;
 
             if (UsesCustomPowerShell(options))
-                return CustomPowerShellHandler.ExecuteCustomPowerShell(script, input.Parameters,
-                    input.LogInformationStream, isScript, options, cancellationToken);
+            {
+                return CustomPowerShellHandler.ExecuteCustomPowerShell(
+                    script,
+                    input.Parameters,
+                    input.LogInformationStream,
+                    isScript,
+                    options,
+                    cancellationToken);
+            }
 
             return DoAndHandleSession(options.Session, session =>
-                ExecuteCommand(script, input.Parameters, input.LogInformationStream, isScript, session.PowerShell,
+                ExecuteCommand(
+                    script,
+                    input.Parameters,
+                    input.LogInformationStream,
+                    isScript,
+                    session.PowerShell,
                     cancellationToken));
         }
         catch (Exception ex)
