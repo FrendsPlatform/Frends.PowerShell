@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Management.Automation.Runspaces;
+
 namespace Frends.PowerShell.RunCommand;
 
 /// <summary>
@@ -7,9 +8,6 @@ namespace Frends.PowerShell.RunCommand;
 /// </summary>
 public class SessionWrapper : IDisposable
 {
-    internal Runspace Runspace;
-    internal System.Management.Automation.PowerShell PowerShell;
-
     internal SessionWrapper()
     {
         var host = new TaskPowershellHost();
@@ -18,6 +16,19 @@ public class SessionWrapper : IDisposable
         PowerShell = System.Management.Automation.PowerShell.Create();
 
         PowerShell.Runspace = Runspace;
+    }
+
+    internal Runspace Runspace { get; private set; }
+
+    internal System.Management.Automation.PowerShell PowerShell { get; private set; }
+
+    /// <summary>
+    /// Disposes the PowerShell and runspace resources.
+    /// </summary>
+    public void Dispose()
+    {
+        ReleaseUnmanagedResources();
+        GC.SuppressFinalize(this);
     }
 
     private void ReleaseUnmanagedResources()
@@ -30,6 +41,7 @@ public class SessionWrapper : IDisposable
         {
             Trace.WriteLine($"Encountered error while disposing powershell session: {e}");
         }
+
         PowerShell = null;
 
         try
@@ -40,15 +52,7 @@ public class SessionWrapper : IDisposable
         {
             Trace.WriteLine($"Encountered error while disposing powershell runspace: {e}");
         }
-        Runspace = null;
-    }
 
-    /// <summary>
-    /// Dispose.
-    /// </summary>
-    public void Dispose()
-    {
-        ReleaseUnmanagedResources();
-        GC.SuppressFinalize(this);
+        Runspace = null;
     }
 }

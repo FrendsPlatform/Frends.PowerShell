@@ -1,10 +1,10 @@
-﻿using Frends.PowerShell.RunCommand.Definitions;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
+using Frends.PowerShell.RunCommand.Definitions;
 using Frends.PowerShell.RunCommand.Helpers;
 
 [assembly: InternalsVisibleTo("Frends.PowerShell.RunCommand.Tests")]
@@ -16,13 +16,15 @@ namespace Frends.PowerShell.RunCommand;
 /// </summary>
 public static class PowerShell
 {
-    /// For mem cleanup.
+    // For memory cleanup.
     static PowerShell()
     {
         var currentAssembly = Assembly.GetExecutingAssembly();
         var currentContext = AssemblyLoadContext.GetLoadContext(currentAssembly);
         if (currentContext != null)
+        {
             currentContext.Unloading += OnPluginUnloadingRequested;
+        }
     }
 
     /// <summary>
@@ -41,12 +43,22 @@ public static class PowerShell
         try
         {
             if (UsesCustomPowerShell(options))
-                return CustomPowerShellHandler.ExecuteCustomPowerShell(input.Command, input.Parameters,
-                    input.LogInformationStream, options, cancellationToken);
+            {
+                return CustomPowerShellHandler.ExecuteCustomPowerShell(
+                    input.Command,
+                    input.Parameters,
+                    input.LogInformationStream,
+                    options,
+                    cancellationToken);
+            }
 
             return DoAndHandleSession(options?.Session, (session) =>
             {
-                return ExecuteCommand(input.Command, input.Parameters, input.LogInformationStream, session.PowerShell,
+                return ExecuteCommand(
+                    input.Command,
+                    input.Parameters,
+                    input.LogInformationStream,
+                    session.PowerShell,
                     cancellationToken);
             });
         }
@@ -56,13 +68,21 @@ public static class PowerShell
         }
     }
 
+    internal static SessionWrapper CreateSession()
+    {
+        return new SessionWrapper();
+    }
+
     private static bool UsesCustomPowerShell(Options options)
     {
         return options?.PowerShellType == PowerShellType.Custom;
     }
 
-    private static Result ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters,
-        bool logInformationStream, System.Management.Automation.PowerShell powershell,
+    private static Result ExecuteCommand(
+        string inputCommand,
+        PowerShellParameter[] powerShellParameters,
+        bool logInformationStream,
+        System.Management.Automation.PowerShell powershell,
         CancellationToken cancellationToken)
     {
         var command = new Command(inputCommand, isScript: false, useLocalScope: false);
@@ -83,21 +103,23 @@ public static class PowerShell
         return errors.Select(err => $"{err.ScriptStackTrace}: {err.Exception.Message}").ToList();
     }
 
-    private static Result ExecutePowershell(System.Management.Automation.PowerShell powershell,
+    private static Result ExecutePowershell(
+        System.Management.Automation.PowerShell powershell,
         bool logInformationStream)
     {
         try
         {
             var execution = powershell.Invoke();
+            var log = logInformationStream
+                ? string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
+                : string.Empty;
+
+            // PowerShell return values are usually wrapped inside a PowerShell object; unwrap them or return the actual object.
             var result = new Result(
                 true,
-                // Powershell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
                 execution?.Select(PowerShellHandler.GetResultObject).ToList(),
                 GetErrorMessages(powershell.Streams.Error),
-                logInformationStream == false
-                    ? ""
-                    : string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
-            );
+                log);
 
             return result;
         }
@@ -109,20 +131,19 @@ public static class PowerShell
         finally
         {
             powershell.Commands
-                .Clear(); // Clear the executed commands from the session so they do not get executed again
+                .Clear();
+
+            // Clear executed commands so they are not run again in the session.
             powershell.Streams.ClearStreams();
         }
     }
 
-    internal static SessionWrapper CreateSession()
-    {
-        return new SessionWrapper();
-    }
-
-    private static Result DoAndHandleSession(SessionWrapper sessionFromOutside,
+    private static Result DoAndHandleSession(
+        SessionWrapper sessionFromOutside,
         Func<SessionWrapper, Result> action)
     {
         SessionWrapper internalSession = null;
+
         // use the external session if provided or create and dispose an internal session
         var session = sessionFromOutside ?? (internalSession = CreateSession());
 

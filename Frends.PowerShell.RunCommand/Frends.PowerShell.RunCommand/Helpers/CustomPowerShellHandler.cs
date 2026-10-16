@@ -74,14 +74,21 @@ internal static class CustomPowerShellHandler
         cancellationToken.ThrowIfCancellationRequested();
 
         if (options.Session != null)
+        {
             throw new InvalidOperationException("A shared session cannot be used with a custom PowerShell executable.");
+        }
 
         if (string.IsNullOrWhiteSpace(options.PathToCustomPowerShell))
+        {
             throw new ArgumentException("Path to custom PowerShell must be provided.", nameof(options));
+        }
 
         if (!File.Exists(options.PathToCustomPowerShell))
-            throw new FileNotFoundException("The custom PowerShell executable was not found.",
+        {
+            throw new FileNotFoundException(
+                "The custom PowerShell executable was not found.",
                 options.PathToCustomPowerShell);
+        }
 
         var parameters = new Dictionary<string, object>();
 
@@ -107,7 +114,7 @@ internal static class CustomPowerShellHandler
             CreateNoWindow = true,
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
-            RedirectStandardError = true
+            RedirectStandardError = true,
         };
         startInfo.Environment["FRENDS_RESULT_BOUNDARY"] = resultBoundary;
         startInfo.ArgumentList.Add("-NoLogo");

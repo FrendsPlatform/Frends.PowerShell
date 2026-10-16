@@ -1,77 +1,54 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Management.Automation.Host;
+
 namespace Frends.PowerShell.RunCommand;
 
 /// <summary>
-/// This is a sample implementation of the PSHost abstract class for 
-/// console applications. Not all members are implemented. Those that 
-/// are not implemented throw a NotImplementedException exception or 
-/// return nothing.
+/// Provides the host implementation used by the PowerShell task.
 /// </summary>
 internal class TaskPowershellHost : PSHost
 {
-    private readonly TaskUserInterface _userInterface = new();
+    private readonly TaskUserInterface userInterface = new();
+    private readonly CultureInfo originalCultureInfo = Thread.CurrentThread.CurrentCulture;
+    private readonly CultureInfo originalUiCultureInfo = Thread.CurrentThread.CurrentUICulture;
+    private readonly Guid myId = Guid.NewGuid();
 
     /// <summary>
-    /// The culture information of the thread that created this object.
-    /// </summary>
-    private readonly CultureInfo _originalCultureInfo = Thread.CurrentThread.CurrentCulture;
-
-    /// <summary>
-    /// The UI culture information of the thread that created this object.
-    /// </summary>
-    private readonly CultureInfo _originalUiCultureInfo = Thread.CurrentThread.CurrentUICulture;
-
-    /// <summary>
-    /// The identifier of this PSHost implementation.
-    /// </summary>
-    private readonly Guid _myId = Guid.NewGuid();
-
-    /// <summary>
-    /// Initializes a new instance of the MyHost class. Keep
-    /// a reference to the host application object so that it 
-    /// can be informed of when to exit.
+    /// Initializes a new instance of the <see cref="TaskPowershellHost"/> class.
     /// </summary>
     public TaskPowershellHost()
     {
     }
 
     /// <summary>
-    /// Return the culture information to use. This implementation 
-    /// returns a snapshot of the culture information of the thread 
-    /// that created this object.
+    /// Gets the culture information captured when this host was created.
     /// </summary>
     /// <example>en-US</example>
     public override CultureInfo CurrentCulture
     {
-        get { return _originalCultureInfo; }
+        get { return originalCultureInfo; }
     }
 
     /// <summary>
-    /// Return the UI culture information to use. This implementation 
-    /// returns a snapshot of the UI culture information of the thread 
-    /// that created this object.
+    /// Gets the UI culture information captured when this host was created.
     /// </summary>
     /// <example>en-US</example>
     public override CultureInfo CurrentUICulture
     {
-        get { return _originalUiCultureInfo; }
+        get { return originalUiCultureInfo; }
     }
 
     /// <summary>
-    /// This implementation always returns the GUID allocated at 
-    /// instantiation time.
+    /// Gets the identifier allocated when this host was created.
     /// </summary>
     /// <example>3f2504e0-4f89-11d3-9a0c-0305e82c3301</example>
     public override Guid InstanceId
     {
-        get { return _myId; }
+        get { return myId; }
     }
 
     /// <summary>
-    /// Return a string that contains the name of the host implementation. 
-    /// Keep in mind that this string may be used by script writers to
-    /// identify when your host is being used.
+    /// Gets the name of this host implementation.
     /// </summary>
     /// <example>SimpleTaskPowershellHost</example>
     public override string Name
@@ -79,20 +56,17 @@ internal class TaskPowershellHost : PSHost
         get { return "SimpleTaskPowershellHost"; }
     }
 
-
     /// <summary>
-    /// This sample does not implement a PSHostUserInterface component so
-    /// this property simply returns null.
+    /// Gets the user interface for this host.
     /// </summary>
     /// <example>TaskUserInterface</example>
     public override PSHostUserInterface UI
     {
-        get { return _userInterface; }
+        get { return userInterface; }
     }
 
     /// <summary>
-    /// Return the version object for this application. Typically this
-    /// should match the version resource in the application.
+    /// Gets the version of this host implementation.
     /// </summary>
     /// <example>1.0.0.0</example>
     public override Version Version
@@ -109,8 +83,7 @@ internal class TaskPowershellHost : PSHost
     }
 
     /// <summary>
-    /// Not implemented by this example class. The call fails with
-    /// a NotImplementedException exception.
+    /// Throws because nested prompts are not supported.
     /// </summary>
     /// <example>Not supported</example>
     public override void EnterNestedPrompt()
@@ -119,8 +92,7 @@ internal class TaskPowershellHost : PSHost
     }
 
     /// <summary>
-    /// Not implemented by this example class. The call fails
-    /// with a NotImplementedException exception.
+    /// Throws because nested prompts are not supported.
     /// </summary>
     /// <example>Not supported</example>
     public override void ExitNestedPrompt()
@@ -129,11 +101,7 @@ internal class TaskPowershellHost : PSHost
     }
 
     /// <summary>
-    /// This API is called before an external application process is 
-    /// started. Typically it is used to save state so the parent can 
-    /// restore state that has been modified by a child process (after 
-    /// the child exits). In this example, this functionality is not  
-    /// needed so the method returns nothing.
+    /// Does nothing before an external application process is started.
     /// </summary>
     /// <example>No action</example>
     public override void NotifyBeginApplication()
@@ -142,10 +110,7 @@ internal class TaskPowershellHost : PSHost
     }
 
     /// <summary>
-    /// This API is called after an external application process finishes.
-    /// Typically it is used to restore state that a child process may
-    /// have altered. In this example, this functionality is not  
-    /// needed so the method returns nothing.
+    /// Does nothing after an external application process finishes.
     /// </summary>
     /// <example>No action</example>
     public override void NotifyEndApplication()
