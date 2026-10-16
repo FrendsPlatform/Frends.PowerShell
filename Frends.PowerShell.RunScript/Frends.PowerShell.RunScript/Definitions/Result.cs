@@ -5,6 +5,15 @@
 /// </summary>
 public class Result
 {
+    internal Result(bool success, IList<dynamic> output, IList<string> errors, string log, Error error = null)
+    {
+        Success = success;
+        Error = error;
+        Output = output;
+        Errors = errors;
+        Log = log;
+    }
+
     /// <summary>
     /// Output of the script.
     /// </summary>
@@ -34,13 +43,4 @@ public class Result
     /// </summary>
     /// <example>null</example>
     public Error Error { get; private set; }
-
-    internal Result(bool success, IList<dynamic> output, IList<string> errors, string log, Error error = null)
-    {
-        Success = success;
-        Error = error;
-        Output = output;
-        Errors = errors;
-        Log = log;
-    }
 }

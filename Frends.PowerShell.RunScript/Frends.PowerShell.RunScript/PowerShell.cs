@@ -16,7 +16,7 @@ namespace Frends.PowerShell.RunScript;
 /// </summary>
 public static class PowerShell
 {
-    /// For mem cleanup.
+    // For memory cleanup.
     static PowerShell()
     {
         var currentAssembly = Assembly.GetExecutingAssembly();
@@ -71,13 +71,50 @@ public static class PowerShell
         }
     }
 
+    internal static Result RunCommand(
+        string command,
+        PowerShellParameter[] parameters,
+        [Browsable(false)] Options options,
+        CancellationToken cancellationToken)
+    {
+        if (UsesCustomPowerShell(options))
+        {
+            return CustomPowerShellHandler.ExecuteCustomPowerShell(
+                command,
+                parameters,
+                false,
+                isScript: false,
+                options,
+                cancellationToken);
+        }
+
+        return DoAndHandleSession(options?.Session, session =>
+            ExecuteCommand(
+                command,
+                parameters,
+                false,
+                isScript: false,
+                session.PowerShell,
+                cancellationToken));
+    }
+
+    internal static SessionWrapper CreateSession()
+    {
+        // Leave this internal for now, turn public to support shared sessions between task executions
+        return new SessionWrapper();
+    }
+
     private static bool UsesCustomPowerShell(Options options)
     {
         return options?.PowerShellType == PowerShellType.Custom;
     }
 
-    private static Result ExecuteCommand(string inputCommand, PowerShellParameter[] powerShellParameters,
-        bool logInformationStream, bool isScript, System.Management.Automation.PowerShell powershell,
+    private static Result ExecuteCommand(
+        string inputCommand,
+        PowerShellParameter[] powerShellParameters,
+        bool logInformationStream,
+        bool isScript,
+        System.Management.Automation.PowerShell powershell,
         CancellationToken cancellationToken)
     {
         var command = new Command(inputCommand, isScript: isScript, useLocalScope: false);
@@ -94,10 +131,12 @@ public static class PowerShell
         return ExecutePowershell(powershell, logInformationStream);
     }
 
-    private static Result DoAndHandleSession(SessionWrapper sessionFromOutside,
+    private static Result DoAndHandleSession(
+        SessionWrapper sessionFromOutside,
         Func<SessionWrapper, Result> action)
     {
         SessionWrapper internalSession = null;
+
         // use the external session if provided or create and dispose an internal session
         var session = sessionFromOutside ?? (internalSession = CreateSession());
 
@@ -111,35 +150,32 @@ public static class PowerShell
         }
     }
 
-    internal static SessionWrapper CreateSession()
-    {
-        // Leave this internal for now, turn public to support shared sessions between task executions
-        return new SessionWrapper();
-    }
-
-    private static Result ExecutePowershell(System.Management.Automation.PowerShell powershell,
+    private static Result ExecutePowershell(
+        System.Management.Automation.PowerShell powershell,
         bool logInformationStream)
     {
         try
         {
             var execution = powershell.Invoke();
-            var result = new Result
-            (
+            var log = logInformationStream
+                ? string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
+                : string.Empty;
+
+            // PowerShell return values are usually wrapped inside a PowerShell object; unwrap them when possible.
+            var result = new Result(
                 true,
-                // PowerShell return values are usually wrapped inside of a powershell object, unwrap it or if it does not have a baseObject, return the actual object
                 execution?.Select(PowerShellHandler.GetResultObject).ToList(),
                 GetErrorMessages(powershell.Streams.Error),
-                logInformationStream == false
-                    ? ""
-                    : string.Join("\n", powershell.Streams.Information.Select(info => info.MessageData.ToString()))
-            );
+                log);
 
             return result;
         }
         catch (Exception e)
         {
-            throw new Exception(
-                $"Encountered terminating error while executing powershell: \n{e}\nErrors:\n{string.Join("\n", GetErrorMessages(powershell.Streams.Error))}");
+            var errorMessages = string.Join("\n", GetErrorMessages(powershell.Streams.Error));
+            var errorMessage =
+                $"Encountered terminating error while executing powershell: \n{e}\nErrors:\n{errorMessages}";
+            throw new Exception(errorMessage);
         }
         finally
         {
@@ -154,27 +190,8 @@ public static class PowerShell
         return errors.Select(err => $"{err.ScriptStackTrace}: {err.Exception.Message}").ToList();
     }
 
-    /// <summary>
-    /// Executes a PowerShell command with parameters, leave parameter value empty for a switch.
-    /// This method is for testing and to enable running scripts on device.
-    /// </summary>
-    public static Result RunCommand(string command, PowerShellParameter[] parameters,
-        [Browsable(false)] Options options, CancellationToken cancellationToken)
-    {
-        if (UsesCustomPowerShell(options))
-            return CustomPowerShellHandler.ExecuteCustomPowerShell(command, parameters, false, isScript: false,
-                options, cancellationToken);
-
-        return DoAndHandleSession(options?.Session, (session) =>
-        {
-            return ExecuteCommand(command, parameters, false, isScript: false, session.PowerShell,
-                cancellationToken: cancellationToken);
-        });
-    }
-
     private static void OnPluginUnloadingRequested(AssemblyLoadContext obj)
     {
         obj.Unloading -= OnPluginUnloadingRequested;
     }
-
 }

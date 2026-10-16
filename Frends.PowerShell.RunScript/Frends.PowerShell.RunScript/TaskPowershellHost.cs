@@ -11,27 +11,25 @@ namespace Frends.PowerShell.RunScript;
 /// </summary>
 internal class TaskPowershellHost : PSHost
 {
-    private readonly TaskUserInterface _userInterface = new();
+    private readonly TaskUserInterface userInterface = new();
 
     /// <summary>
     /// The culture information of the thread that created this object.
     /// </summary>
-    private readonly CultureInfo _originalCultureInfo = Thread.CurrentThread.CurrentCulture;
+    private readonly CultureInfo originalCultureInfo = Thread.CurrentThread.CurrentCulture;
 
     /// <summary>
     /// The UI culture information of the thread that created this object.
     /// </summary>
-    private readonly CultureInfo _originalUiCultureInfo = Thread.CurrentThread.CurrentUICulture;
+    private readonly CultureInfo originalUiCultureInfo = Thread.CurrentThread.CurrentUICulture;
 
     /// <summary>
     /// The identifier of this PSHost implementation.
     /// </summary>
-    private readonly Guid _myId = Guid.NewGuid();
+    private readonly Guid myId = Guid.NewGuid();
 
     /// <summary>
-    /// Initializes a new instance of the MyHost class. Keep
-    /// a reference to the host application object so that it
-    /// can be informed of when to exit.
+    /// Initializes a new instance of the <see cref="TaskPowershellHost"/> class.
     /// </summary>
     public TaskPowershellHost()
     {
@@ -45,7 +43,7 @@ internal class TaskPowershellHost : PSHost
     /// <example>en-US</example>
     public override CultureInfo CurrentCulture
     {
-        get { return _originalCultureInfo; }
+        get { return originalCultureInfo; }
     }
 
     /// <summary>
@@ -56,7 +54,7 @@ internal class TaskPowershellHost : PSHost
     /// <example>en-US</example>
     public override CultureInfo CurrentUICulture
     {
-        get { return _originalUiCultureInfo; }
+        get { return originalUiCultureInfo; }
     }
 
     /// <summary>
@@ -66,7 +64,7 @@ internal class TaskPowershellHost : PSHost
     /// <example>3f2504e0-4f89-11d3-9a0c-0305e82c3301</example>
     public override Guid InstanceId
     {
-        get { return _myId; }
+        get { return myId; }
     }
 
     /// <summary>
@@ -87,7 +85,7 @@ internal class TaskPowershellHost : PSHost
     /// <example>TaskUserInterface</example>
     public override PSHostUserInterface UI
     {
-        get { return _userInterface; }
+        get { return userInterface; }
     }
 
     /// <summary>
@@ -106,7 +104,6 @@ internal class TaskPowershellHost : PSHost
     /// <param name="exitCode">Requested exit code.</param>
     public override void SetShouldExit(int exitCode)
     {
-
     }
 
     /// <summary>
