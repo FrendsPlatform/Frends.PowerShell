@@ -40,8 +40,6 @@ public static class PowerShell
     {
         try
         {
-            ValidationHandler.Run(input, options);
-
             var script = input.ReadFromFile ? input.ScriptFilePath : input.Script;
             var isScript = !input.ReadFromFile;
 
