@@ -238,7 +238,7 @@ Add-Type -TypeDefinition $Source -Language CSharp
 get-process -name doesnotexist -ErrorAction Stop
 ";
 
-        var resultError = Assert.Throws<Exception>(() => PowerShell.RunScript(new Input { ReadFromFile = false, Script = script, LogInformationStream = true }, null, default));
+        var resultError = Assert.Throws<Exception>(() => PowerShell.RunScript(new Input { ReadFromFile = false, Script = script, LogInformationStream = true }, new Options{ThrowErrorOnFailure = false}, default));
 
         Assert.That(resultError.Message, Is.Not.Null);
     }
@@ -257,7 +257,7 @@ $test
             ReadFromFile = false,
             Script = script,
             LogInformationStream = true
-        }, null, default);
+        }, new Options(), default);
 
         Assert.That(result.Output[0].Property1, Is.EqualTo("Value1"));
         Assert.That(result.Output[0].Property2, Is.EqualTo("Value2"));
