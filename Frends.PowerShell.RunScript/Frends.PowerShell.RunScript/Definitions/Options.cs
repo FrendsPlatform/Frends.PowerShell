@@ -9,21 +9,6 @@ namespace Frends.PowerShell.RunScript.Definitions;
 public class Options
 {
     /// <summary>
-    /// Whether to throw an error on failure.
-    /// </summary>
-    /// <example>true</example>
-    [DefaultValue(true)]
-    public bool ThrowErrorOnFailure { get; set; } = true;
-
-    /// <summary>
-    /// Overrides the error message on failure. If `ThrowErrorOnFailure` is set to `true`, then the original exception will be wrapped in a new Exception with this error message.
-    /// </summary>
-    /// <example>Running the PowerShell script failed</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("")]
-    public string ErrorMessageOnFailure { get; set; } = string.Empty;
-
-    /// <summary>
     /// PowerShell executable to use.
     /// </summary>
     /// <example>Default</example>
@@ -55,4 +40,19 @@ public class Options
     [DisplayFormat(DataFormatString = "Expression")]
     [UIHint(nameof(PowerShellType), "", PowerShellType.Default)]
     public SessionWrapper Session { get; set; }
+
+    /// <summary>
+    /// Whether to throw an error on failure.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message on failure. If `ThrowErrorOnFailure` is set to `true`, then the original exception will be wrapped in a new Exception with this error message.
+    /// </summary>
+    /// <example>Running the PowerShell script failed</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }

@@ -15,6 +15,12 @@ public class Result
     }
 
     /// <summary>
+    /// Indicates whether the script was executed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; private set; }
+
+    /// <summary>
     /// Output of the script.
     /// </summary>
     /// <example>{Property1=Value1; Property2=Value2}</example>
@@ -31,12 +37,6 @@ public class Result
     /// </summary>
     /// <example>foo bar</example>
     public string Log { get; private set; }
-
-    /// <summary>
-    /// Indicates whether the script was executed successfully.
-    /// </summary>
-    /// <example>true</example>
-    public bool Success { get; private set; }
 
     /// <summary>
     /// Error details. Null when Success is true.
