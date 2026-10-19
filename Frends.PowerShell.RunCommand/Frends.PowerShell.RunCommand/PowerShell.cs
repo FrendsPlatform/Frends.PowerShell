@@ -64,7 +64,7 @@ public static class PowerShell
         }
         catch (Exception ex)
         {
-            return ex.Handle(options ?? new Options());
+            return ex.Handle(options);
         }
     }
 
