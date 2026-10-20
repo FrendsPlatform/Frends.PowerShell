@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.0] - 2026-10-15
+### Changed
+- **[Breaking Change]** The script output is now returned in the `Output` property of the Task result (previously `Result`).
+- **[Breaking Change]** The Task parameters are now named `Input` and `Options`, and the Task returns a `Result` object.
+### Added
+- `Success` and `Error` properties in the Task result.
+- `ThrowErrorOnFailure` and `ErrorMessageOnFailure` options. By default, the Task still throws when script execution fails; when `ThrowErrorOnFailure` is false, a failed result is returned instead.
+- Completed the documentation of the Task.
+
 ## [1.3.0] - 2026-09-23
 ### Added
 - Option to execute scripts with a custom PowerShell executable. New option can't use shared session, but can have execution policy set

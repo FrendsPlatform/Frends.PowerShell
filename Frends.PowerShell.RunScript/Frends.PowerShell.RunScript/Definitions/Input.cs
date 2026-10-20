@@ -6,7 +6,7 @@ namespace Frends.PowerShell.RunScript.Definitions;
 /// <summary>
 /// Input parameters.
 /// </summary>
-public class RunScriptInput
+public class Input
 {
     /// <summary>
     /// Parameters for the script, provided switch parameters need to have a boolean value
@@ -41,23 +41,4 @@ public class RunScriptInput
     /// </summary>
     /// <example>true</example>
     public bool LogInformationStream { get; set; }
-}
-
-/// <summary>
-/// PowerShell parameter.
-/// </summary>
-public class PowerShellParameter
-{
-    /// <summary>
-    /// Parameter's name.
-    /// </summary>
-    /// <example>foo</example>
-    public string Name { get; set; }
-
-    /// <summary>
-    /// Parameter's value.
-    /// </summary>
-    /// <example>bar</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    public object Value { get; set; }
 }

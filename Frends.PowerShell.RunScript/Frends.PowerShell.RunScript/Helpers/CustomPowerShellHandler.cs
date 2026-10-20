@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Diagnostics;
 using System.Management.Automation;
 using System.Text;
@@ -9,73 +9,73 @@ namespace Frends.PowerShell.RunScript.Helpers;
 internal static class CustomPowerShellHandler
 {
     private const string WrapperScript = """
-        $envelopeXml = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String([Console]::In.ReadToEnd()))
-        $envelope = [System.Management.Automation.PSSerializer]::Deserialize($envelopeXml)
-        $target = $envelope['Target']
-        $isScript = [bool]$envelope['IsScript']
-        $parameters = $envelope['Parameters']
-        if ($null -eq $parameters) { $parameters = @{} }
+                                         $envelopeXml = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String([Console]::In.ReadToEnd()))
+                                         $envelope = [System.Management.Automation.PSSerializer]::Deserialize($envelopeXml)
+                                         $target = $envelope['Target']
+                                         $isScript = [bool]$envelope['IsScript']
+                                         $parameters = $envelope['Parameters']
+                                         if ($null -eq $parameters) { $parameters = @{} }
 
-        $errors = @()
-        $information = @()
-        $terminatingError = $false
+                                         $errors = @()
+                                         $information = @()
+                                         $terminatingError = $false
 
-        try {
-            if ($isScript) {
-                $scriptBlock = [scriptblock]::Create($target)
-                $allOutput = @(& $scriptBlock @parameters *>&1)
-            }
-            else {
-                $allOutput = @(& $target @parameters *>&1)
-            }
+                                         try {
+                                             if ($isScript) {
+                                                 $scriptBlock = [scriptblock]::Create($target)
+                                                 $allOutput = @(& $scriptBlock @parameters *>&1)
+                                             }
+                                             else {
+                                                 $allOutput = @(& $target @parameters *>&1)
+                                             }
 
-            $results = @()
-            foreach ($item in $allOutput) {
-                if ($item -is [System.Management.Automation.ErrorRecord]) {
-                    $errors += $item
-                }
-                elseif ($item -is [System.Management.Automation.InformationRecord]) {
-                    $information += $item
-                }
-                elseif ($item -isnot [System.Management.Automation.WarningRecord] -and
-                    $item -isnot [System.Management.Automation.VerboseRecord] -and
-                    $item -isnot [System.Management.Automation.DebugRecord] -and
-                    $item -isnot [System.Management.Automation.ProgressRecord]) {
-                    $results += $item
-                }
-            }
-        }
-        catch {
-            $errors += $_
-            $results = @()
-            $terminatingError = $true
-        }
+                                             $results = @()
+                                             foreach ($item in $allOutput) {
+                                                 if ($item -is [System.Management.Automation.ErrorRecord]) {
+                                                     $errors += $item
+                                                 }
+                                                 elseif ($item -is [System.Management.Automation.InformationRecord]) {
+                                                     $information += $item
+                                                 }
+                                                 elseif ($item -isnot [System.Management.Automation.WarningRecord] -and
+                                                     $item -isnot [System.Management.Automation.VerboseRecord] -and
+                                                     $item -isnot [System.Management.Automation.DebugRecord] -and
+                                                     $item -isnot [System.Management.Automation.ProgressRecord]) {
+                                                     $results += $item
+                                                 }
+                                             }
+                                         }
+                                         catch {
+                                             $errors += $_
+                                             $results = @()
+                                             $terminatingError = $true
+                                         }
 
-        $errorMessages = @($errors | ForEach-Object { "$($_.ScriptStackTrace): $($_.Exception.Message)" })
-        $informationMessages = @($information | ForEach-Object { "$($_.MessageData)" })
+                                         $errorMessages = @($errors | ForEach-Object { "$($_.ScriptStackTrace): $($_.Exception.Message)" })
+                                         $informationMessages = @($information | ForEach-Object { "$($_.MessageData)" })
 
-        $payload = @{
-            Results = $results
-            Errors = $errorMessages
-            Information = $informationMessages
-        }
-        $payloadXml = [System.Management.Automation.PSSerializer]::Serialize($payload, 100)
-        $payloadBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($payloadXml))
+                                         $payload = @{
+                                             Results = $results
+                                             Errors = $errorMessages
+                                             Information = $informationMessages
+                                         }
+                                         $payloadXml = [System.Management.Automation.PSSerializer]::Serialize($payload, 100)
+                                         $payloadBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($payloadXml))
 
-        [Console]::Out.Write("$env:FRENDS_RESULT_BOUNDARY$payloadBase64$env:FRENDS_RESULT_END")
-        [Console]::Out.Flush()
+                                         [Console]::Out.Write("$env:FRENDS_RESULT_BOUNDARY$payloadBase64$env:FRENDS_RESULT_END")
+                                         [Console]::Out.Flush()
 
-        if ($terminatingError) {
-            exit 1
-        }
-        """;
+                                         if ($terminatingError) {
+                                             exit 1
+                                         }
+                                         """;
 
-    public static PowerShellResult ExecuteCustomPowerShell(
+    internal static Result ExecuteCustomPowerShell(
         string target,
         PowerShellParameter[] powerShellParameters,
         bool logInformationStream,
         bool isScript,
-        RunOptions options,
+        Options options,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -87,8 +87,11 @@ internal static class CustomPowerShellHandler
             throw new ArgumentException("Path to custom PowerShell must be provided.", nameof(options));
 
         if (!File.Exists(options.PathToCustomPowerShell))
-            throw new FileNotFoundException("The custom PowerShell executable was not found.",
+        {
+            throw new FileNotFoundException(
+                "The custom PowerShell executable was not found.",
                 options.PathToCustomPowerShell);
+        }
 
         var parameters = new Dictionary<string, object>();
 
@@ -116,7 +119,7 @@ internal static class CustomPowerShellHandler
             CreateNoWindow = true,
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
-            RedirectStandardError = true
+            RedirectStandardError = true,
         };
         startInfo.Environment["FRENDS_RESULT_BOUNDARY"] = resultBoundary;
         startInfo.Environment["FRENDS_RESULT_END"] = resultEndMarker;
@@ -184,13 +187,13 @@ internal static class CustomPowerShellHandler
 
         var results = ToObjectList(payload["Results"])
             .Select(item => item is PSObject powerShellObject
-                    ? PowerShellHandler.GetResultObject(powerShellObject)
-                    : item)
+                ? PowerShellHandler.GetResultObject(powerShellObject)
+                : item)
             .Cast<dynamic>()
             .ToList();
         var information = logInformationStream ? ToObjectList(payload["Information"]) : [];
 
-        return new PowerShellResult(results, errors, string.Join("\n", information));
+        return new Result(true, results, errors, string.Join("\n", information));
     }
 
     internal static void AddExecutionPolicyArguments(
@@ -213,7 +216,8 @@ internal static class CustomPowerShellHandler
             value = powerShellObject.BaseObject;
 
         return value as IDictionary
-            ?? throw new InvalidOperationException("The custom PowerShell process returned an unexpected result payload.");
+               ?? throw new InvalidOperationException(
+                   "The custom PowerShell process returned an unexpected result payload.");
     }
 
     private static IList<object> ToObjectList(object value)
