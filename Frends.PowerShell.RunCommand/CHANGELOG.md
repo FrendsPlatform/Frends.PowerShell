@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.0] - 2026-10-15
+### Changed
+- **[Breaking Change]** The Task's parameter and result types were renamed to follow the Frends Task standard (`Input`, `Options` and `Result`). Existing process definitions may need to be re-saved.
+- **[Breaking Change]** The `Result` property of the Task result was renamed to `Results`. Update any references such as `#result.Result` to `#result.Results`.
+- Added `ThrowErrorOnFailure` and `ErrorMessageOnFailure` options. By default, the Task still throws on failure; when `ThrowErrorOnFailure` is disabled the Task returns a result with `Success` set to false and the failure details in `Error`.
+- Added `Success` and `Error` properties to the Task result.
+- Added missing documentation to the Task.
+
 ## [1.3.0] - 2026-09-29
 ### Added
 - Option to execute commands with a custom PowerShell executable. Custom PowerShell executions cannot use a shared session and can set an execution policy.

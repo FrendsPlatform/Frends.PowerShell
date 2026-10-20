@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Diagnostics;
 using System.Management.Automation;
 using System.Text;
@@ -9,79 +9,86 @@ namespace Frends.PowerShell.RunCommand.Helpers;
 internal static class CustomPowerShellHandler
 {
     private const string WrapperScript = """
-        $envelopeXml = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String([Console]::In.ReadToEnd()))
-        $envelope = [System.Management.Automation.PSSerializer]::Deserialize($envelopeXml)
-        $target = $envelope['Target']
-        $parameters = $envelope['Parameters']
-        if ($null -eq $parameters) { $parameters = @{} }
+                                         $envelopeXml = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String([Console]::In.ReadToEnd()))
+                                         $envelope = [System.Management.Automation.PSSerializer]::Deserialize($envelopeXml)
+                                         $target = $envelope['Target']
+                                         $parameters = $envelope['Parameters']
+                                         if ($null -eq $parameters) { $parameters = @{} }
 
-        $errors = @()
-        $information = @()
-        $terminatingError = $false
+                                         $errors = @()
+                                         $information = @()
+                                         $terminatingError = $false
 
-        try {
-            $allOutput = @(& $target @parameters *>&1)
+                                         try {
+                                             $allOutput = @(& $target @parameters *>&1)
 
-            $results = @($allOutput | Where-Object {
-                if ($_ -is [System.Management.Automation.ErrorRecord]) {
-                    $errors += $_
-                    return $false
-                }
+                                             $results = @($allOutput | Where-Object {
+                                                 if ($_ -is [System.Management.Automation.ErrorRecord]) {
+                                                     $errors += $_
+                                                     return $false
+                                                 }
 
-                if ($_ -is [System.Management.Automation.InformationRecord]) {
-                    $information += $_
-                    return $false
-                }
+                                                 if ($_ -is [System.Management.Automation.InformationRecord]) {
+                                                     $information += $_
+                                                     return $false
+                                                 }
 
-                return $_ -isnot [System.Management.Automation.WarningRecord] -and
-                    $_ -isnot [System.Management.Automation.VerboseRecord] -and
-                    $_ -isnot [System.Management.Automation.DebugRecord] -and
-                    $_ -isnot [System.Management.Automation.ProgressRecord]
-            })
-        }
-        catch {
-            $errors += $_
-            $results = @()
-            $terminatingError = $true
-        }
+                                                 return $_ -isnot [System.Management.Automation.WarningRecord] -and
+                                                     $_ -isnot [System.Management.Automation.VerboseRecord] -and
+                                                     $_ -isnot [System.Management.Automation.DebugRecord] -and
+                                                     $_ -isnot [System.Management.Automation.ProgressRecord]
+                                             })
+                                         }
+                                         catch {
+                                             $errors += $_
+                                             $results = @()
+                                             $terminatingError = $true
+                                         }
 
-        $errorMessages = @($errors | ForEach-Object { "$($_.ScriptStackTrace): $($_.Exception.Message)" })
-        $informationMessages = @($information | ForEach-Object { "$($_.MessageData)" })
+                                         $errorMessages = @($errors | ForEach-Object { "$($_.ScriptStackTrace): $($_.Exception.Message)" })
+                                         $informationMessages = @($information | ForEach-Object { "$($_.MessageData)" })
 
-        $payload = @{
-            Results = $results
-            Errors = $errorMessages
-            Information = $informationMessages
-        }
-        $payloadXml = [System.Management.Automation.PSSerializer]::Serialize($payload, 100)
-        $payloadBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($payloadXml))
+                                         $payload = @{
+                                             Results = $results
+                                             Errors = $errorMessages
+                                             Information = $informationMessages
+                                         }
+                                         $payloadXml = [System.Management.Automation.PSSerializer]::Serialize($payload, 100)
+                                         $payloadBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($payloadXml))
 
-        [Console]::Out.Write("$env:FRENDS_RESULT_BOUNDARY$payloadBase64")
-        [Console]::Out.Flush()
+                                         [Console]::Out.Write("$env:FRENDS_RESULT_BOUNDARY$payloadBase64")
+                                         [Console]::Out.Flush()
 
-        if ($terminatingError) {
-            exit 1
-        }
-        """;
+                                         if ($terminatingError) {
+                                             exit 1
+                                         }
+                                         """;
 
-    public static PowerShellResult ExecuteCustomPowerShell(
+    internal static Result ExecuteCustomPowerShell(
         string command,
         PowerShellParameter[] powerShellParameters,
         bool logInformationStream,
-        RunOptions options,
+        Options options,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         if (options.Session != null)
+        {
             throw new InvalidOperationException("A shared session cannot be used with a custom PowerShell executable.");
+        }
 
         if (string.IsNullOrWhiteSpace(options.PathToCustomPowerShell))
+        {
             throw new ArgumentException("Path to custom PowerShell must be provided.", nameof(options));
+        }
 
         if (!File.Exists(options.PathToCustomPowerShell))
-            throw new FileNotFoundException("The custom PowerShell executable was not found.",
+        {
+            throw new FileNotFoundException(
+                "The custom PowerShell executable was not found.",
                 options.PathToCustomPowerShell);
+        }
 
         var parameters = new Dictionary<string, object>();
 
@@ -107,7 +114,7 @@ internal static class CustomPowerShellHandler
             CreateNoWindow = true,
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
-            RedirectStandardError = true
+            RedirectStandardError = true,
         };
         startInfo.Environment["FRENDS_RESULT_BOUNDARY"] = resultBoundary;
         startInfo.ArgumentList.Add("-NoLogo");
@@ -168,7 +175,7 @@ internal static class CustomPowerShellHandler
             .ToList();
         var information = logInformationStream ? ToObjectList(payload["Information"]) : [];
 
-        return new PowerShellResult(results, errors, string.Join("\n", information));
+        return new Result(true, results, errors, string.Join("\n", information));
     }
 
     internal static void AddExecutionPolicyArguments(
@@ -191,7 +198,8 @@ internal static class CustomPowerShellHandler
             value = powerShellObject.BaseObject;
 
         return value as IDictionary
-            ?? throw new InvalidOperationException("The custom PowerShell process returned an unexpected result payload.");
+               ?? throw new InvalidOperationException(
+                   "The custom PowerShell process returned an unexpected result payload.");
     }
 
     private static IList<object> ToObjectList(object value)
